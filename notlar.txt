@@ -1,0 +1,3 @@
+alınan db hataları
+2025: delete record does not exist
+2002: unique kısıtlama hatası

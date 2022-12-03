@@ -1,0 +1,7 @@
+{
+    "T1000": "Unknown data error",
+    "T1001": "Data not provided as JSON",
+    "T1002": "Data fields not provided with valid types ",
+    "T1003": "Requested data not exists",
+    "T1004": "Requested data exists"
+}

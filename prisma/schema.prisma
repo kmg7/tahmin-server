@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+  // shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+model User {
+  id          String       @id @default(uuid())
+  authId      String       @unique
+  username    String       @unique
+  email       String       @unique
+  password    String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  scores      Score[]
+  predictions Prediction[]
+}
+
+model Team {
+  id          String  @id @unique
+  name        String
+  shName      String
+  logoUrl     String
+  homeMatches Match[] @relation("homeMatches")
+  awayMatches Match[] @relation("awayMatches")
+}
+
+model Tournament {
+  id        String      @id @unique
+  name      String
+  shName    String
+  logoUrl   String
+  stages    Stage[]
+  Standings Standings[]
+}
+
+model Stage {
+  id           String     @id @unique
+  tournamentId String
+  name         String
+  matches      Match[]
+  tournament   Tournament @relation(fields: [tournamentId], references: [id])
+}
+
+model Match {
+  id           String       @id @unique
+  date         DateTime
+  homeTeamId   String
+  awayTeamId   String
+  matchScoreId String       @unique
+  stageId      String
+  predictions  Prediction[]
+  stage        Stage        @relation(fields: [stageId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  homeTeam     Team         @relation("homeMatches", fields: [homeTeamId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  awayTeam     Team         @relation("awayMatches", fields: [awayTeamId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model MatchScore {
+  id        String @id @unique
+  homeScore Int?
+  awayScore Int?
+  stageId   String
+}
+
+model Prediction {
+  id        String  @id
+  matchId   String
+  homeScore Int
+  awayScore Int
+  userId    String
+  processed Boolean @default(false)
+  match     Match   @relation(fields: [matchId], references: [id])
+  user      User    @relation(fields: [userId], references: [id])
+}
+
+model Standings {
+  id           String     @id
+  tournamentId String     @unique
+  tournament   Tournament @relation(fields: [tournamentId], references: [id])
+  scores       Score[]
+}
+
+model Score {
+  id           String    @id
+  username     String
+  tournamentId String
+  standingsId  String
+  User         User      @relation(fields: [username], references: [username])
+  Standings    Standings @relation(fields: [standingsId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
