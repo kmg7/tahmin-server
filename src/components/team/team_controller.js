@@ -1,63 +1,64 @@
-const service = require('./match_service');
+const service = require('./team_service');
 const { StatusCodes } = require('http-status-codes');
-const createMatch = async (req, res) => {
-  const response = await service.createMatch(req.body);
+
+const createTeam = async (req, res) => {
+  const response = await service.createTeam(req.body);
   if (response.success) {
     res.status(StatusCodes.CREATED).json(response);
   } else {
     res.status(StatusCodes.BAD_REQUEST).json(response);
   }
 };
-const createManyMatch = async (req, res) => {
-  const response = await service.createManyMatch(req.body);
+const createManyTeam = async (req, res) => {
+  const response = await service.createManyTeam(req.body);
   if (response.success) {
     res.status(StatusCodes.CREATED).json(response);
   } else {
     res.status(StatusCodes.BAD_REQUEST).json(response);
   }
 };
-const updateMatch = async (req, res) => {
-  const response = await service.updateMatch(req.body);
+const updateTeam = async (req, res) => {
+  const response = await service.updateTeam(req.body);
   if (response.success) {
     res.status(StatusCodes.OK).json(response);
   } else {
     res.status(StatusCodes.BAD_REQUEST).json(response);
   }
 };
-const deleteMatch = async (req, res) => {
-  const response = await service.deleteMatch(req.body);
+const deleteTeam = async (req, res) => {
+  const response = await service.deleteTeam(req.body);
   if (response.success) {
     res.status(StatusCodes.OK).json(response);
   } else {
     res.status(StatusCodes.BAD_REQUEST).json(response);
   }
 };
-const deleteManyMatch = async (req, res) => {
-  const response = await service.deleteManyMatch(req.body);
+const deleteManyTeam = async (req, res) => {
+  const response = await service.deleteManyTeam(req.body);
   if (response.success) {
     res.status(StatusCodes.OK).json(response);
   } else {
     res.status(StatusCodes.BAD_REQUEST).json(response);
   }
 };
-const getMatch = async (req, res) => {
-  const response = await service.getMatch(req.body);
+const getTeam = async (req, res) => {
+  const response = await service.getTeam(req.body);
   if (response.success) {
     res.status(StatusCodes.OK).json(response);
   } else {
     res.status(StatusCodes.BAD_REQUEST).json(response);
   }
 };
-const getAllMatches = async (req, res) => {
-  const response = await service.getAllMatches();
+const getAllTeams = async (req, res) => {
+  const response = await service.getAllTeams();
   if (response.success) {
     res.status(StatusCodes.OK).json(response);
   } else {
     res.status(StatusCodes.BAD_REQUEST).json(response);
   }
 };
-const searchMatch = async (req, res) => {
-  const response = await service.searchMatch(req.body);
+const searchTeam = async (req, res) => {
+  const response = await service.searchTeam(req.body);
   if (response.success) {
     res.status(StatusCodes.OK).json(response);
   } else {
@@ -66,12 +67,12 @@ const searchMatch = async (req, res) => {
 };
 
 module.exports = {
-  searchMatch,
-  createMatch,
-  createManyMatch,
-  getMatch,
-  getAllMatches,
-  updateMatch,
-  deleteMatch,
-  deleteManyMatch,
+  createTeam,
+  createManyTeam,
+  updateTeam,
+  deleteTeam,
+  deleteManyTeam,
+  getTeam,
+  getAllTeams,
+  searchTeam,
 };

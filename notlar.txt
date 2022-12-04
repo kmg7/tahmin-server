@@ -1,3 +1,4 @@
 alınan db hataları
 2025: delete record does not exist
 2002: unique kısıtlama hatası
+2018: bağlanırken bağlanılcak yoksa hata verir eğer biri bile hata verirse hiçbirini bağlamaz

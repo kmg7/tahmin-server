@@ -3,9 +3,12 @@ const express = require('express');
 const app = express();
 const vermodel = require('./components/status/status_model');
 const tournament = require('./components/match/tournament/tournament_controller');
+const main = '/api/v1';
 app.use(express.json());
+app.use(main, require('./components/match/match_route'));
+app.use(main, require('./components/team/team_route'));
+app.use(main, require('./components/match_score/match_score_route'));
 
-app.use('/api/v1/match', require('./components/match/match_route'));
 app.get('/', (req, res) => {
   vermodel.readVersion();
   res.send('done');

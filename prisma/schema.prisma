@@ -35,35 +35,33 @@ model Tournament {
   shName    String
   logoUrl   String
   stages    Stage[]
-  Standings Standings[]
+  standings Standings[]
 }
 
 model Stage {
-  id           String     @id @unique
-  tournamentId String
+  id           String      @id @unique
+  tournamentId String?
   name         String
   matches      Match[]
-  tournament   Tournament @relation(fields: [tournamentId], references: [id])
+  tournament   Tournament? @relation(fields: [tournamentId], references: [id])
 }
 
 model Match {
-  id           String       @id @unique
-  date         DateTime
-  homeTeamId   String
-  awayTeamId   String
-  matchScoreId String       @unique
-  stageId      String
-  predictions  Prediction[]
-  stage        Stage        @relation(fields: [stageId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  homeTeam     Team         @relation("homeMatches", fields: [homeTeamId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  awayTeam     Team         @relation("awayMatches", fields: [awayTeamId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id          String       @id @unique
+  dateTime    DateTime
+  homeTeamId  String?
+  awayTeamId  String?
+  stageId     String?
+  predictions Prediction[]
+  stage       Stage?       @relation(fields: [stageId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  homeTeam    Team?        @relation("homeMatches", fields: [homeTeamId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  awayTeam    Team?        @relation("awayMatches", fields: [awayTeamId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model MatchScore {
   id        String @id @unique
-  homeScore Int?
-  awayScore Int?
-  stageId   String
+  homeScore Int
+  awayScore Int
 }
 
 model Prediction {
@@ -89,6 +87,6 @@ model Score {
   username     String
   tournamentId String
   standingsId  String
-  User         User      @relation(fields: [username], references: [username])
-  Standings    Standings @relation(fields: [standingsId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user         User      @relation(fields: [username], references: [username])
+  standings    Standings @relation(fields: [standingsId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }

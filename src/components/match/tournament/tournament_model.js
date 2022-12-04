@@ -3,12 +3,8 @@ const { dbClient: db, dbError } = require('../../../utils/database');
 const createTournament = async (tournament) => {
   try {
     const response = await db.tournament.create({
-      data: {
-        id: tournament.id,
-        name: tournament.name,
-        shName: tournament.shName,
-        logoUrl: tournament.logoUrl,
-      },
+      data: tournament,
+      include: { stages: true },
     });
     return { success: true, data: response };
   } catch (error) {
@@ -23,6 +19,7 @@ const getTournament = async (tournamentId) => {
   try {
     const response = await db.tournament.findUnique({
       where: { id: tournamentId },
+      include: { stages: true },
     });
     return { success: true, data: response };
   } catch (error) {
@@ -37,12 +34,8 @@ const updateTournament = async (tournamentId, tournament) => {
   try {
     const response = await db.tournament.update({
       where: { id: tournamentId },
-      data: {
-        id: tournament.id,
-        name: tournament.name,
-        shName: tournament.shName,
-        logoUrl: tournament.logoUrl,
-      },
+      include: { stages: true },
+      data: tournament,
     });
 
     return { success: true, data: response };
@@ -58,6 +51,7 @@ const deleteTournament = async (tournamentId) => {
   try {
     const response = await db.tournament.delete({
       where: { id: tournamentId },
+      include: { stages: true },
     });
     return { success: true, data: response };
   } catch (error) {
@@ -73,6 +67,7 @@ const searchTournaments = async (tournamentId) => {
     const response = await db.tournament.findMany({
       where: { id: { startsWith: tournamentId } },
       orderBy: { id: 'asc' },
+      include: { stages: true },
     });
     return { success: true, data: response };
   } catch (error) {
@@ -86,6 +81,7 @@ const getAllTournaments = async () => {
   try {
     const response = await db.tournament.findMany({
       orderBy: { id: 'asc' },
+      include: { stages: true },
     });
     return { success: true, data: response };
   } catch (error) {
@@ -114,6 +110,7 @@ const deleteManyTournament = async (tournamentIds) => {
   try {
     const response = await db.tournament.deleteMany({
       where: { id: { in: tournamentIds } },
+      include: { stages: true },
     });
     return { success: true, data: response };
   } catch (error) {
@@ -136,6 +133,44 @@ const createManyTournament = async (tournaments) => {
     };
   }
 };
+const connectStages = async (tournamentId, stages) => {
+  try {
+    const response = await db.tournament.update({
+      where: { id: tournamentId },
+      include: { stages: true },
+      data: {
+        stages: {
+          connect: stages.map((c) => ({ id: c })),
+        },
+      },
+    });
+    return { success: true, data: response };
+  } catch (error) {
+    return {
+      success: false,
+      error: dbError(error),
+    };
+  }
+};
+const disconnectStages = async (tournamentId, stages) => {
+  try {
+    const response = await db.tournament.update({
+      where: { id: tournamentId },
+      include: { stages: true },
+      data: {
+        stages: {
+          disconnect: stages.map((c) => ({ id: c })),
+        },
+      },
+    });
+    return { success: true, data: response };
+  } catch (error) {
+    return {
+      success: false,
+      error: dbError(error),
+    };
+  }
+};
 
 module.exports = {
   createTournament,
@@ -147,4 +182,6 @@ module.exports = {
   deleteManyTournament,
   updateTournament,
   ifExists,
+  connectStages,
+  disconnectStages,
 };

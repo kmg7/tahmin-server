@@ -1,63 +1,63 @@
-const service = require('./match_service');
+const service = require('./match_score_service');
 const { StatusCodes } = require('http-status-codes');
-const createMatch = async (req, res) => {
-  const response = await service.createMatch(req.body);
+const createMatchScore = async (req, res) => {
+  const response = await service.createMatchScore(req.body);
   if (response.success) {
     res.status(StatusCodes.CREATED).json(response);
   } else {
     res.status(StatusCodes.BAD_REQUEST).json(response);
   }
 };
-const createManyMatch = async (req, res) => {
-  const response = await service.createManyMatch(req.body);
+const createManyMatchScore = async (req, res) => {
+  const response = await service.createManyMatchScore(req.body);
   if (response.success) {
     res.status(StatusCodes.CREATED).json(response);
   } else {
     res.status(StatusCodes.BAD_REQUEST).json(response);
   }
 };
-const updateMatch = async (req, res) => {
-  const response = await service.updateMatch(req.body);
+const updateMatchScore = async (req, res) => {
+  const response = await service.updateMatchScore(req.body);
   if (response.success) {
     res.status(StatusCodes.OK).json(response);
   } else {
     res.status(StatusCodes.BAD_REQUEST).json(response);
   }
 };
-const deleteMatch = async (req, res) => {
-  const response = await service.deleteMatch(req.body);
+const deleteMatchScore = async (req, res) => {
+  const response = await service.deleteMatchScore(req.body);
   if (response.success) {
     res.status(StatusCodes.OK).json(response);
   } else {
     res.status(StatusCodes.BAD_REQUEST).json(response);
   }
 };
-const deleteManyMatch = async (req, res) => {
-  const response = await service.deleteManyMatch(req.body);
+const deleteManyMatchScore = async (req, res) => {
+  const response = await service.deleteManyMatchScore(req.body);
   if (response.success) {
     res.status(StatusCodes.OK).json(response);
   } else {
     res.status(StatusCodes.BAD_REQUEST).json(response);
   }
 };
-const getMatch = async (req, res) => {
-  const response = await service.getMatch(req.body);
+const getMatchScore = async (req, res) => {
+  const response = await service.getMatchScore(req.body);
   if (response.success) {
     res.status(StatusCodes.OK).json(response);
   } else {
     res.status(StatusCodes.BAD_REQUEST).json(response);
   }
 };
-const getAllMatches = async (req, res) => {
-  const response = await service.getAllMatches();
+const getAllMatchScores = async (req, res) => {
+  const response = await service.getAllMatchScores();
   if (response.success) {
     res.status(StatusCodes.OK).json(response);
   } else {
     res.status(StatusCodes.BAD_REQUEST).json(response);
   }
 };
-const searchMatch = async (req, res) => {
-  const response = await service.searchMatch(req.body);
+const searchMatchScore = async (req, res) => {
+  const response = await service.searchMatchScore(req.body);
   if (response.success) {
     res.status(StatusCodes.OK).json(response);
   } else {
@@ -66,12 +66,12 @@ const searchMatch = async (req, res) => {
 };
 
 module.exports = {
-  searchMatch,
-  createMatch,
-  createManyMatch,
-  getMatch,
-  getAllMatches,
-  updateMatch,
-  deleteMatch,
-  deleteManyMatch,
+  searchMatchScore,
+  createMatchScore,
+  createManyMatchScore,
+  getMatchScore,
+  getAllMatchScores,
+  updateMatchScore,
+  deleteMatchScore,
+  deleteManyMatchScore,
 };

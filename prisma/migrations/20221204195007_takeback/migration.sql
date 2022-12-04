@@ -1,0 +1,22 @@
+BEGIN TRY
+
+BEGIN TRAN;
+
+-- DropForeignKey
+ALTER TABLE [dbo].[Match] DROP CONSTRAINT [Match_homeTeamId_fkey];
+
+-- AddForeignKey
+ALTER TABLE [dbo].[Match] ADD CONSTRAINT [Match_homeTeamId_fkey] FOREIGN KEY ([homeTeamId]) REFERENCES [dbo].[Team]([id]) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+COMMIT TRAN;
+
+END TRY
+BEGIN CATCH
+
+IF @@TRANCOUNT > 0
+BEGIN
+    ROLLBACK TRAN;
+END;
+THROW
+
+END CATCH

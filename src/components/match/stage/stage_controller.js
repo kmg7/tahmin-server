@@ -1,80 +1,80 @@
-const service = require('./tournament_service');
+const service = require('./stage_service');
 const { StatusCodes } = require('http-status-codes');
 
-const createTournament = async (req, res) => {
-  const response = await service.createTournament(req.body);
+const createStage = async (req, res) => {
+  const response = await service.createStage(req.body);
   if (response.success) {
     res.status(StatusCodes.CREATED).json(response);
   } else {
     res.status(StatusCodes.BAD_REQUEST).json(response);
   }
 };
-const createManyTournament = async (req, res) => {
-  const response = await service.createManyTournament(req.body);
+const createManyStage = async (req, res) => {
+  const response = await service.createManyStage(req.body);
   if (response.success) {
     res.status(StatusCodes.CREATED).json(response);
   } else {
     res.status(StatusCodes.BAD_REQUEST).json(response);
   }
 };
-const updateTournament = async (req, res) => {
-  const response = await service.updateTournament(req.body);
+const updateStage = async (req, res) => {
+  const response = await service.updateStage(req.body);
   if (response.success) {
     res.status(StatusCodes.OK).json(response);
   } else {
     res.status(StatusCodes.BAD_REQUEST).json(response);
   }
 };
-const deleteTournament = async (req, res) => {
-  const response = await service.deleteTournament(req.body);
+const deleteStage = async (req, res) => {
+  const response = await service.deleteStage(req.body);
   if (response.success) {
     res.status(StatusCodes.OK).json(response);
   } else {
     res.status(StatusCodes.BAD_REQUEST).json(response);
   }
 };
-const deleteManyTournament = async (req, res) => {
-  const response = await service.deleteManyTournament(req.body);
+const deleteManyStage = async (req, res) => {
+  const response = await service.deleteManyStage(req.body);
   if (response.success) {
     res.status(StatusCodes.OK).json(response);
   } else {
     res.status(StatusCodes.BAD_REQUEST).json(response);
   }
 };
-const getTournament = async (req, res) => {
-  const response = await service.getTournament(req.body);
+const getStage = async (req, res) => {
+  const response = await service.getStage(req.body);
   if (response.success) {
     res.status(StatusCodes.OK).json(response);
   } else {
     res.status(StatusCodes.BAD_REQUEST).json(response);
   }
 };
-const getAllTournaments = async (req, res) => {
-  const response = await service.getAllTournaments();
+const getAllStages = async (req, res) => {
+  const response = await service.getAllStages();
   if (response.success) {
     res.status(StatusCodes.OK).json(response);
   } else {
     res.status(StatusCodes.BAD_REQUEST).json(response);
   }
 };
-const searchTournament = async (req, res) => {
-  const response = await service.searchTournaments(req.body);
+const searchStage = async (req, res) => {
+  const response = await service.searchStage(req.body);
   if (response.success) {
     res.status(StatusCodes.OK).json(response);
   } else {
     res.status(StatusCodes.BAD_REQUEST).json(response);
   }
 };
-const connectStages = async (req, res) => {
-  const response = await service.connectStages(req.body);
+const connectMatches = async (req, res) => {
+  const response = await service.connectMatches(req.body);
   if (response.success) {
     res.status(StatusCodes.OK).json(response);
   } else {
     res.status(StatusCodes.BAD_REQUEST).json(response);
   }
 };
-const disconnectStages = async (req, res) => {
-  const response = await service.disconnectStages(req.body);
+const disconnectMatches = async (req, res) => {
+  const response = await service.disconnectMatches(req.body);
   if (response.success) {
     res.status(StatusCodes.OK).json(response);
   } else {
@@ -82,14 +82,14 @@ const disconnectStages = async (req, res) => {
   }
 };
 module.exports = {
-  createTournament,
-  createManyTournament,
-  updateTournament,
-  deleteTournament,
-  deleteManyTournament,
-  getTournament,
-  getAllTournaments,
-  searchTournament,
-  connectStages,
-  disconnectStages,
+  createStage,
+  createManyStage,
+  getStage,
+  getAllStages,
+  searchStage,
+  deleteManyStage,
+  deleteStage,
+  updateStage,
+  connectMatches,
+  disconnectMatches,
 };

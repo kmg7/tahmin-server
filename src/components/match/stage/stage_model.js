@@ -2,14 +2,9 @@ const { dbClient: db, dbError } = require('../../../utils/database');
 //TODO  prisma dataları burada ayarlanmalı tüm modeller için devam hata kodlarını ayarla
 const createStage = async (stage) => {
   try {
+    console.log(stage);
     const response = await db.stage.create({
-      data: {
-        id: stage.id,
-        name: stage.name,
-        tournament: {
-          connect: stage.tournamentId,
-        },
-      },
+      data: stage,
     });
     return { success: true, data: response };
   } catch (error) {
@@ -38,10 +33,7 @@ const updateStage = async (stageId, stage) => {
   try {
     const response = await db.stage.update({
       where: { id: stageId },
-      data: {
-        id: stage.id,
-        name: stage.name,
-      },
+      data: stage,
     });
     return { success: true, data: response };
   } catch (error) {
@@ -66,11 +58,37 @@ const deleteStage = async (stageId) => {
   }
 };
 
-const getAllStages = async (stageIds) => {
+const searchStage = async (stageId) => {
   try {
     const response = await db.stage.findMany({
-      where: { id: { id: stageIds } },
-      orderBy: { dateTime: 'asc' },
+      where: { id: { startsWith: stageId } },
+      orderBy: { id: 'asc' },
+    });
+    return { success: true, data: response };
+  } catch (error) {
+    return {
+      success: false,
+      error: dbError(error),
+    };
+  }
+};
+const createManyStage = async (stages) => {
+  try {
+    const response = await db.stage.createMany({
+      data: stages,
+    });
+    return { success: true, data: response };
+  } catch (error) {
+    return {
+      success: false,
+      error: dbError(error),
+    };
+  }
+};
+const getAllStages = async () => {
+  try {
+    const response = await db.stage.findMany({
+      orderBy: { id: 'asc' },
     });
     return { success: true, data: response };
   } catch (error) {
@@ -81,10 +99,38 @@ const getAllStages = async (stageIds) => {
   }
 };
 
-const deleteAllStages = async (stageIds) => {
+const deleteManyStage = async (stageIds) => {
   try {
     const response = await db.stage.deleteMany({
-      where: { id: stageIds },
+      where: { id: { in: stageIds } },
+    });
+    return { success: true, data: response };
+  } catch (error) {
+    return {
+      success: false,
+      error: dbError(error),
+    };
+  }
+};
+const connectMatches = async (stageId, matches) => {
+  try {
+    const response = await db.stage.update({
+      where: { id: stageId },
+      data: { matches: { connect: matches } },
+    });
+    return { success: true, data: response };
+  } catch (error) {
+    return {
+      success: false,
+      error: dbError(error),
+    };
+  }
+};
+const disconnectMatches = async (stageId, matches) => {
+  try {
+    const response = await db.stage.update({
+      where: { id: stageId },
+      data: { matches: { disconnect: matches } },
     });
     return { success: true, data: response };
   } catch (error) {
@@ -97,9 +143,13 @@ const deleteAllStages = async (stageIds) => {
 
 module.exports = {
   createStage,
+  createManyStage,
   getStage,
   getAllStages,
-  deleteAllStages,
+  searchStage,
+  deleteManyStage,
   deleteStage,
   updateStage,
+  connectMatches,
+  disconnectMatches,
 };
