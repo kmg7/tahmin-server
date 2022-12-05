@@ -1,8 +1,8 @@
 const { dbClient: db, dbError } = require('../../utils/database');
-const createuser = async (user) => {
+const createUser = async (user) => {
   try {
-    const userResponse = await db.user.create({ data: user });
-    return { success: true, data: userResponse };
+    const response = await db.user.create({ data: user });
+    return { success: true, data: response };
   } catch (error) {
     return {
       success: false,
@@ -10,12 +10,12 @@ const createuser = async (user) => {
     };
   }
 };
-const getuser = async (userId) => {
+const getUser = async (username) => {
   try {
-    const userResponse = await db.user.findUnique({
-      where: { id: userId },
+    const response = await db.user.findUnique({
+      where: { username: username },
     });
-    return { success: true, data: userResponse };
+    return { success: true, data: response };
   } catch (error) {
     return {
       success: false,
@@ -23,14 +23,14 @@ const getuser = async (userId) => {
     };
   }
 };
-const updateuser = async (userId, user) => {
+const updateUser = async (username, user) => {
   try {
-    const userResponse = await db.user.update({
-      where: { id: userId },
+    const response = await db.user.update({
+      where: { username: username },
       data: user,
     });
 
-    return { success: true, data: userResponse };
+    return { success: true, data: response };
   } catch (error) {
     return {
       success: false,
@@ -38,12 +38,12 @@ const updateuser = async (userId, user) => {
     };
   }
 };
-const deleteuser = async (userId) => {
+const deleteUser = async (username) => {
   try {
-    const userResponse = await db.user.delete({
-      where: { id: userId },
+    const response = await db.user.delete({
+      where: { username: username },
     });
-    return { success: true, data: userResponse };
+    return { success: true, data: response };
   } catch (error) {
     return {
       success: false,
@@ -51,13 +51,13 @@ const deleteuser = async (userId) => {
     };
   }
 };
-const getuseres = async (userId) => {
+const searchUser = async (username) => {
   try {
-    const userResponse = await db.user.findMany({
-      where: { id: { startsWith: userId } },
-      orderBy: { dateTime: 'asc' },
+    const response = await db.user.findMany({
+      where: { username: { startsWith: username } },
+      orderBy: { username: 'asc' },
     });
-    return { success: true, data: userResponse };
+    return { success: true, data: response };
   } catch (error) {
     return {
       success: false,
@@ -65,12 +65,39 @@ const getuseres = async (userId) => {
     };
   }
 };
-const deleteuseres = async (userId) => {
+const getAllUsers = async (username) => {
   try {
-    const userResponse = await db.user.deleteMany({
-      where: { id: { startsWith: id } },
+    const response = await db.user.findMany({
+      where: { username: { startsWith: username } },
+      orderBy: { username: 'asc' },
     });
-    return { success: true, data: userResponse };
+    return { success: true, data: response };
+  } catch (error) {
+    return {
+      success: false,
+      error: dbError(error),
+    };
+  }
+};
+const deleteManyUser = async (username) => {
+  try {
+    const response = await db.user.deleteMany({
+      where: { username: { startsWith: id } },
+    });
+    return { success: true, data: response };
+  } catch (error) {
+    return {
+      success: false,
+      error: dbError(error),
+    };
+  }
+};
+const createManyUser = async (users) => {
+  try {
+    const response = await db.user.createMany({
+      data: users,
+    });
+    return { success: true, data: response };
   } catch (error) {
     return {
       success: false,
@@ -79,10 +106,11 @@ const deleteuseres = async (userId) => {
   }
 };
 module.exports = {
-  createuser,
-  getuser,
-  updateuser,
-  deleteuser,
-  getuseres,
-  deleteuseres,
+  createManyUser,
+  createUser,
+  getAllUsers,
+  getUser,
+  updateUser,
+  deleteManyUser,
+  deleteUser,
 };

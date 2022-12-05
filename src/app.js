@@ -8,6 +8,8 @@ app.use(express.json());
 app.use(main, require('./components/match/match_route'));
 app.use(main, require('./components/team/team_route'));
 app.use(main, require('./components/match_score/match_score_route'));
+app.use(main, require('./components/user/user_route'));
+app.use(main, require('./components/prediction/prediction_route'));
 
 app.get('/', (req, res) => {
   vermodel.readVersion();
