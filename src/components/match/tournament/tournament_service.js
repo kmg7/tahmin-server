@@ -1,7 +1,6 @@
 const model = require('./tournament_model');
 const modelError = require('../../../errors/model_error');
 const Joi = require('joi');
-//TODO error responding with proj error codes implement
 
 const searchTournaments = async (data) => {
   try {

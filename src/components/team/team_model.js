@@ -39,7 +39,6 @@ const updateTeam = async (teamId, team) => {
     });
     return { success: true, data: response };
   } catch (error) {
-    console.log(error);
     return {
       success: false,
       error: dbError(error),

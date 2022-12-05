@@ -2,7 +2,6 @@ const Joi = require('joi');
 const { string } = require('../../../utils/validators');
 const model = require('./stage_model');
 const modelError = require('../../../errors/model_error');
-//TODO error responding with proj error codes implement
 const searchStage = async (data) => {
   try {
     await validateId(data.id);
@@ -149,8 +148,9 @@ const deleteManyStage = async (data) => {
 };
 const connectMatches = async (data) => {
   try {
+    await validateId(data.id);
     await validateIds(data.matches);
-    const response = await model.connectMatches(data.matches);
+    const response = await model.connectMatches(data.id, data.matches);
     if (!response.success) {
       return {
         success: false,
@@ -167,8 +167,9 @@ const connectMatches = async (data) => {
 };
 const disconnectMatches = async (data) => {
   try {
+    await validateId(data.id);
     await validateIds(data.matches);
-    const response = await model.disconnectMatches(data.matches);
+    const response = await model.disconnectMatches(data.id, data.matches);
     if (!response.success) {
       return {
         success: false,

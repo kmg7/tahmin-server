@@ -101,7 +101,6 @@ const ifExists = async (tournamentId) => {
     }
     return false;
   } catch (error) {
-    console.log(error);
     return false;
   }
 };
@@ -110,7 +109,6 @@ const deleteManyTournament = async (tournamentIds) => {
   try {
     const response = await db.tournament.deleteMany({
       where: { id: { in: tournamentIds } },
-      include: { stages: true },
     });
     return { success: true, data: response };
   } catch (error) {

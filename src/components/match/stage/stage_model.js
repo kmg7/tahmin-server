@@ -1,10 +1,9 @@
 const { dbClient: db, dbError } = require('../../../utils/database');
-//TODO  prisma dataları burada ayarlanmalı tüm modeller için devam hata kodlarını ayarla
 const createStage = async (stage) => {
   try {
-    console.log(stage);
     const response = await db.stage.create({
       data: stage,
+      include: { matches: true },
     });
     return { success: true, data: response };
   } catch (error) {
@@ -19,6 +18,7 @@ const getStage = async (stageId) => {
   try {
     const response = await db.stage.findUnique({
       where: { id: stageId },
+      include: { matches: true },
     });
     return { success: true, data: response };
   } catch (error) {
@@ -34,6 +34,7 @@ const updateStage = async (stageId, stage) => {
     const response = await db.stage.update({
       where: { id: stageId },
       data: stage,
+      include: { matches: true },
     });
     return { success: true, data: response };
   } catch (error) {
@@ -48,6 +49,7 @@ const deleteStage = async (stageId) => {
   try {
     const response = await db.stage.delete({
       where: { id: stageId },
+      include: { matches: true },
     });
     return { success: true, data: response };
   } catch (error) {
@@ -63,6 +65,7 @@ const searchStage = async (stageId) => {
     const response = await db.stage.findMany({
       where: { id: { startsWith: stageId } },
       orderBy: { id: 'asc' },
+      include: { matches: true },
     });
     return { success: true, data: response };
   } catch (error) {
@@ -76,6 +79,7 @@ const createManyStage = async (stages) => {
   try {
     const response = await db.stage.createMany({
       data: stages,
+      include: { matches: true },
     });
     return { success: true, data: response };
   } catch (error) {
@@ -89,6 +93,7 @@ const getAllStages = async () => {
   try {
     const response = await db.stage.findMany({
       orderBy: { id: 'asc' },
+      include: { matches: true },
     });
     return { success: true, data: response };
   } catch (error) {
@@ -116,7 +121,8 @@ const connectMatches = async (stageId, matches) => {
   try {
     const response = await db.stage.update({
       where: { id: stageId },
-      data: { matches: { connect: matches } },
+      data: { matches: { connect: matches.map((c) => ({ id: c })) } },
+      include: { matches: true },
     });
     return { success: true, data: response };
   } catch (error) {
@@ -130,7 +136,8 @@ const disconnectMatches = async (stageId, matches) => {
   try {
     const response = await db.stage.update({
       where: { id: stageId },
-      data: { matches: { disconnect: matches } },
+      data: { matches: { disconnect: matches.map((c) => ({ id: c })) } },
+      include: { matches: true },
     });
     return { success: true, data: response };
   } catch (error) {

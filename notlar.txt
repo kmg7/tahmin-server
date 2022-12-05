@@ -1,4 +1,5 @@
 alınan db hataları
-2025: delete record does not exist
+2025: record not found hatası, alınıdığında bulk işlemler yapılmaz
 2002: unique kısıtlama hatası
+2003: ilişki bağlantıları engeli hatası, bağlantı atılan field değiştirilemez bu hatalar ile ilgili ilerde aksiyon alacağız updatemany gibi ama ihtiyaç üzerine
 2018: bağlanırken bağlanılcak yoksa hata verir eğer biri bile hata verirse hiçbirini bağlamaz
