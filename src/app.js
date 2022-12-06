@@ -10,6 +10,8 @@ app.use(main, require('./components/team/team_route'));
 app.use(main, require('./components/match_score/match_score_route'));
 app.use(main, require('./components/user/user_route'));
 app.use(main, require('./components/prediction/prediction_route'));
+app.use(main, require('./components/standings/standings_route'));
+app.use(main, require('./components/score/score_route'));
 
 app.get('/', (req, res) => {
   vermodel.readVersion();

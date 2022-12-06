@@ -1,7 +1,7 @@
 const { dbClient: db, dbError } = require('../../utils/database');
-const createStandings = async (standings) => {
+const createScore = async (score) => {
   try {
-    const response = await db.standings.create({ data: standings });
+    const response = await db.score.create({ data: score });
     return { success: true, data: response };
   } catch (error) {
     return {
@@ -10,9 +10,9 @@ const createStandings = async (standings) => {
     };
   }
 };
-const createManyStandings = async (standings) => {
+const createManyScore = async (score) => {
   try {
-    const response = await db.standings.createMany({ data: standings });
+    const response = await db.score.createMany({ data: score });
     return { success: true, data: response };
   } catch (error) {
     return {
@@ -21,10 +21,10 @@ const createManyStandings = async (standings) => {
     };
   }
 };
-const getStandings = async (standingsId) => {
+const getScore = async (scoreId) => {
   try {
-    const response = await db.standings.findUnique({
-      where: { id: standingsId },
+    const response = await db.score.findUnique({
+      where: { id: scoreId },
     });
     return { success: true, data: response };
   } catch (error) {
@@ -34,10 +34,10 @@ const getStandings = async (standingsId) => {
     };
   }
 };
-const searchStandings = async (standingsId) => {
+const searchScore = async (scoreId) => {
   try {
-    const response = await db.standings.findMany({
-      where: { id: { startsWith: standingsId } },
+    const response = await db.score.findUnique({
+      where: { id: scoreId },
     });
     return { success: true, data: response };
   } catch (error) {
@@ -47,11 +47,11 @@ const searchStandings = async (standingsId) => {
     };
   }
 };
-const updateStandings = async (standingsId, standings) => {
+const updateScore = async (scoreId, score) => {
   try {
-    const response = await db.standings.update({
-      where: { id: standingsId },
-      data: standings,
+    const response = await db.score.update({
+      where: { id: scoreId },
+      data: score,
     });
 
     return { success: true, data: response };
@@ -62,10 +62,10 @@ const updateStandings = async (standingsId, standings) => {
     };
   }
 };
-const deleteStandings = async (standingsId) => {
+const deleteScore = async (scoreId) => {
   try {
-    const response = await db.standings.delete({
-      where: { id: standingsId },
+    const response = await db.score.delete({
+      where: { id: scoreId },
     });
     return { success: true, data: response };
   } catch (error) {
@@ -75,9 +75,10 @@ const deleteStandings = async (standingsId) => {
     };
   }
 };
-const getAllStandings = async () => {
+const getAllScores = async (scoreId) => {
   try {
-    const response = await db.standings.findMany({
+    const response = await db.score.findMany({
+      where: { id: { startsWith: scoreId } },
       orderBy: { id: 'asc' },
     });
     return { success: true, data: response };
@@ -88,10 +89,10 @@ const getAllStandings = async () => {
     };
   }
 };
-const deleteManyStandings = async (standingsIds) => {
+const deleteManyScore = async (scoreId) => {
   try {
-    const response = await db.standings.deleteMany({
-      where: { id: { in: standingsIds } },
+    const response = await db.score.deleteMany({
+      where: { id: { startsWith: id } },
     });
     return { success: true, data: response };
   } catch (error) {
@@ -102,12 +103,12 @@ const deleteManyStandings = async (standingsIds) => {
   }
 };
 module.exports = {
-  createStandings,
-  createManyStandings,
-  searchStandings,
-  getStandings,
-  getAllStandings,
-  updateStandings,
-  deleteManyStandings,
-  deleteStandings,
+  searchScore,
+  getScore,
+  getAllScores,
+  createScore,
+  createManyScore,
+  updateScore,
+  deleteScore,
+  deleteManyScore,
 };

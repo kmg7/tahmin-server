@@ -87,10 +87,11 @@ model Standings {
 }
 
 model Score {
-  id           String    @id
-  username     String
-  tournamentId String
-  standingsId  String
-  user         User      @relation(fields: [username], references: [username])
-  standings    Standings @relation(fields: [standingsId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id          String    @id @default(uuid())
+  username    String
+  standingsId String
+  user        User      @relation(fields: [username], references: [username])
+  standings   Standings @relation(fields: [standingsId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([standingsId, username])
 }
