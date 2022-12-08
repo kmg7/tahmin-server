@@ -14,7 +14,7 @@ const float = (input) => {
     return isFloat(input.toString());
   }
 };
-const string = (input) => {
+const isString = (input) => {
   return typeof input === 'string' && Object.prototype.toString.call(input) === '[object String]';
 };
 const array = (input) => {
@@ -23,6 +23,6 @@ const array = (input) => {
 module.exports = {
   array,
   float,
-  string,
+  isString,
   integer,
 };

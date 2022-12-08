@@ -1,6 +1,14 @@
 const service = require('./stage_service');
 const { StatusCodes } = require('http-status-codes');
 
+const changeActivity = async (req, res) => {
+  const response = await service.changeStageActivity(req.body);
+  if (response.success) {
+    res.status(StatusCodes.OK).json(response);
+  } else {
+    res.status(StatusCodes.BAD_REQUEST).json(response);
+  }
+};
 const createStage = async (req, res) => {
   const response = await service.createStage(req.body);
   if (response.success) {
@@ -82,6 +90,7 @@ const disconnectMatches = async (req, res) => {
   }
 };
 module.exports = {
+  changeActivity,
   createStage,
   createManyStage,
   getStage,

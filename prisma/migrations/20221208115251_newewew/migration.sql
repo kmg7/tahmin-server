@@ -1,0 +1,22 @@
+BEGIN TRY
+
+BEGIN TRAN;
+
+-- AlterTable
+ALTER TABLE [dbo].[MatchScore] ADD [stageId] NVARCHAR(1000);
+
+-- AddForeignKey
+ALTER TABLE [dbo].[MatchScore] ADD CONSTRAINT [MatchScore_stageId_fkey] FOREIGN KEY ([stageId]) REFERENCES [dbo].[Stage]([id]) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+COMMIT TRAN;
+
+END TRY
+BEGIN CATCH
+
+IF @@TRANCOUNT > 0
+BEGIN
+    ROLLBACK TRAN;
+END;
+THROW
+
+END CATCH

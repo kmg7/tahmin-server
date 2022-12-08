@@ -3,6 +3,7 @@ const express = require('express');
 const app = express();
 const vermodel = require('./components/status/status_model');
 const tournament = require('./components/match/tournament/tournament_controller');
+const debug = require('./components/status/status_service');
 const main = '/api/v1';
 app.use(express.json());
 app.use(main, require('./components/match/match_route'));
@@ -18,7 +19,8 @@ app.get('/', (req, res) => {
   res.send('done');
 });
 app.get('/debug', (req, res) => {
-  tournament.createTournament(req, res);
+  debug.updateStageVersion();
+  res.send('done');
 });
 const start = async () => {
   try {

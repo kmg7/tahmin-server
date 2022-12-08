@@ -25,6 +25,14 @@ const updateTournament = async (req, res) => {
     res.status(StatusCodes.BAD_REQUEST).json(response);
   }
 };
+const changeActivity = async (req, res) => {
+  const response = await service.changeActivity(req.body);
+  if (response.success) {
+    res.status(StatusCodes.OK).json(response);
+  } else {
+    res.status(StatusCodes.BAD_REQUEST).json(response);
+  }
+};
 const deleteTournament = async (req, res) => {
   const response = await service.deleteTournament(req.body);
   if (response.success) {
@@ -82,6 +90,7 @@ const disconnectStages = async (req, res) => {
   }
 };
 module.exports = {
+  changeActivity,
   createTournament,
   createManyTournament,
   updateTournament,

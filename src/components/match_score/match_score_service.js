@@ -1,7 +1,7 @@
 const model = require('./match_score_model');
 const modelError = require('../../errors/model_error');
 const Joi = require('joi');
-
+const { updateStageVersion } = require('../match/stage/stage_model');
 const searchMatchScore = async (data) => {
   try {
     await validateId(data.id);
@@ -15,6 +15,9 @@ const createMatchScore = async (data) => {
   try {
     await validate(data.matchScore);
     const response = await model.createMatchScore(data.matchScore);
+    if (response.success && response.data.stageId) {
+      await updateStageVersion(response.data.stageId);
+    }
     return handleResponse(response);
   } catch (error) {
     return handleError(error);
@@ -51,6 +54,9 @@ const updateMatchScore = async (data) => {
     await validateId(data.id);
     await validate(data.matchScore, false);
     const response = await model.updateMatchScore(data.id, data.matchScore);
+    if (response.success && response.data.stageId) {
+      await updateStageVersion(response.data.stageId);
+    }
     return handleResponse(response);
   } catch (error) {
     return handleError(error);
@@ -60,6 +66,9 @@ const deleteMatchScore = async (data) => {
   try {
     await validateId(data.id);
     const response = await model.deleteMatchScore(data.id);
+    if (response.success && response.data.stageId) {
+      await updateStageVersion(response.data.stageId);
+    }
     return handleResponse(response);
   } catch (error) {
     return handleError(error);
@@ -119,12 +128,14 @@ const idSchema = Joi.string().min(2).max(32).required();
 const idArraySchema = Joi.array().items(idSchema).min(2).required();
 const matchScoreCreateSchema = Joi.object({
   id: Joi.string().min(2).required(),
+  stageId: Joi.string().min(2),
   homeScore: Joi.number().integer().min(0).required(),
   awayScore: Joi.number().integer().min(0).required(),
 });
 const matchScoreCreateManySchema = Joi.array().items(matchScoreCreateSchema).min(2).required();
 const matchScoreUpdateSchema = Joi.object({
   id: Joi.string().min(2),
+  stageId: Joi.string().min(2),
   homeScore: Joi.number().integer().min(0),
   awayScore: Joi.number().integer().min(0),
 });

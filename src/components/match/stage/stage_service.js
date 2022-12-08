@@ -2,6 +2,7 @@ const Joi = require('joi');
 const { string } = require('../../../utils/validators');
 const model = require('./stage_model');
 const modelError = require('../../../errors/model_error');
+const { updateTournamentVersion } = require('../tournament/tournament_model');
 const searchStage = async (data) => {
   try {
     await validateId(data.id);
@@ -29,6 +30,9 @@ const createStage = async (data) => {
         success: false,
         error: response.error,
       };
+    }
+    if (response.data.active && response.data.tournamentId) {
+      await updateTournamentVersion(response.data.tournamentId);
     }
     return {
       success: true,
@@ -67,6 +71,31 @@ const updateStage = async (data) => {
         error: response.error,
       };
     }
+    if (response.data.active && response.data.tournamentId) {
+      await updateTournamentVersion(response.data.tournamentId);
+    }
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error) {
+    return handleError(error);
+  }
+};
+const changeStageActivity = async (data) => {
+  try {
+    await validateId(data.id);
+    await Joi.boolean().required().validateAsync(data.activity);
+    const response = await model.changeActivity(data.id, data.activity);
+    if (!response.success) {
+      return {
+        success: false,
+        error: response.error,
+      };
+    }
+    if (response.data.tournamentId) {
+      await updateTournamentVersion(response.data.tournamentId);
+    }
     return {
       success: true,
       data: response.data,
@@ -84,6 +113,9 @@ const deleteStage = async (data) => {
         success: false,
         error: response.error,
       };
+    }
+    if (response.data.active && response.data.tournamentId) {
+      await updateTournamentVersion(response.data.tournamentId);
     }
     return {
       success: true,
@@ -157,6 +189,7 @@ const connectMatches = async (data) => {
         error: response.error,
       };
     }
+    await model.updateStageVersion(data.id);
     return {
       success: true,
       data: response.data,
@@ -176,6 +209,7 @@ const disconnectMatches = async (data) => {
         error: response.error,
       };
     }
+    await model.updateStageVersion(data.id);
     return {
       success: true,
       data: response.data,
@@ -216,11 +250,14 @@ const idArraySchema = Joi.array().items(idSchema).min(2).required();
 const stageCreateSchema = Joi.object({
   id: Joi.string().required(),
   name: Joi.string().required(),
-});
+  active: Joi.boolean().required(),
+  tournamentId: Joi.string().required(),
+}).required();
 const stageUpdateSchema = Joi.object({
-  id: Joi.string().required(),
-  name: Joi.string().required(),
-});
+  id: Joi.string(),
+  name: Joi.string(),
+  tournamentId: Joi.string(),
+}).required();
 const stageCreateManySchema = Joi.array().items(stageCreateSchema).min(2).required();
 module.exports = {
   searchStage,
@@ -233,4 +270,5 @@ module.exports = {
   updateStage,
   connectMatches,
   disconnectMatches,
+  changeStageActivity,
 };

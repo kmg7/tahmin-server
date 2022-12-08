@@ -1,4 +1,34 @@
 const { dbClient: db, dbError } = require('../../../utils/database');
+const changeActivity = async (stageId, active) => {
+  try {
+    const response = await db.stage.update({
+      where: { id: stageId },
+      data: { active: active },
+    });
+    return { success: true, data: response };
+  } catch (error) {
+    return {
+      success: false,
+      error: dbError(error),
+    };
+  }
+};
+const updateStageVersion = async (stageId) => {
+  try {
+    const response = await db.stage.update({
+      where: { id: stageId },
+      data: {
+        updatedAt: new Date(),
+      },
+    });
+    return { success: true, data: response };
+  } catch (error) {
+    return {
+      success: false,
+      error: dbError(error),
+    };
+  }
+};
 const createStage = async (stage) => {
   try {
     const response = await db.stage.create({
@@ -147,8 +177,33 @@ const disconnectMatches = async (stageId, matches) => {
     };
   }
 };
+const getAllStageVersions = async () => {
+  try {
+    const response = await db.stage.findMany({
+      where: { active: true },
+      orderBy: { id: 'asc' },
+      select: {
+        id: true,
+        updatedAt: true,
+      },
+    });
+    let data = {};
+    response.map((element) => {
+      data[element.id] = element.updatedAt;
+    });
+    return { success: true, data: data };
+  } catch (error) {
+    return {
+      success: false,
+      error: dbError(error),
+    };
+  }
+};
 
 module.exports = {
+  getAllStageVersions,
+  updateStageVersion,
+  changeActivity,
   createStage,
   createManyStage,
   getStage,

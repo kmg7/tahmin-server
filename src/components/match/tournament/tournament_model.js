@@ -1,5 +1,38 @@
 const { dbClient: db, dbError } = require('../../../utils/database');
-
+const updateTournamentVersion = async (tournamentId) => {
+  try {
+    const response = await db.tournament.update({
+      where: { id: tournamentId },
+      select: { updatedAt: true },
+      data: {
+        updatedAt: new Date(),
+      },
+    });
+    return { success: true, data: response };
+  } catch (error) {
+    return {
+      success: false,
+      error: dbError(error),
+    };
+  }
+};
+const changeTournamentActivity = async (tournamentId, active) => {
+  try {
+    const response = await db.tournament.update({
+      where: { id: tournamentId },
+      data: {
+        active: active,
+      },
+      // select: { updatedAt: true },
+    });
+    return { success: true, data: response };
+  } catch (error) {
+    return {
+      success: false,
+      error: dbError(error),
+    };
+  }
+};
 const createTournament = async (tournament) => {
   try {
     const response = await db.tournament.create({
@@ -169,8 +202,37 @@ const disconnectStages = async (tournamentId, stages) => {
     };
   }
 };
+const getAllTournamentsVersions = async () => {
+  try {
+    const response = await db.tournament.findMany({
+      where: { active: true },
+      orderBy: { id: 'asc' },
+      select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+    let data = {};
+    response.map((element) => {
+      data[element.id] = element.updatedAt;
+    });
+    return {
+      success: true,
+      data: data,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: dbError(error),
+    };
+  }
+};
 
 module.exports = {
+  getAllTournamentsVersions,
+  changeTournamentActivity,
+  updateTournamentVersion,
   createTournament,
   createManyTournament,
   getTournament,

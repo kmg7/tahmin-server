@@ -1,8 +1,7 @@
 const matchModel = require('./match_model');
 const modelError = require('../../../errors/model_error');
 const Joi = require('joi');
-//first upsert match score in controller then create match and connect
-//create match, matchscore, connect them to their stages update stage versions
+const { updateStageVersion } = require('../stage/stage_model');
 const searchMatch = async (data) => {
   try {
     await validateId(data.id);
@@ -16,6 +15,9 @@ const createMatch = async (data) => {
   try {
     await validate(data.match);
     const response = await matchModel.createMatch(data.match);
+    if (response.success && response.data.stageId) {
+      await updateStageVersion(response.data.stageId);
+    }
     return handleResponse(response);
   } catch (error) {
     return handleError(error);
@@ -52,6 +54,9 @@ const updateMatch = async (data) => {
     await validateId(data.id);
     await validate(data.match);
     const response = await matchModel.updateMatch(data.id, data.match);
+    if (response.success && response.data.stageId) {
+      await updateStageVersion(response.data.stageId);
+    }
     return handleResponse(response);
   } catch (error) {
     return handleError(error);
@@ -61,6 +66,9 @@ const deleteMatch = async (data) => {
   try {
     await validateId(data.id);
     const response = await matchModel.deleteMatch(data.id);
+    if (response.success && response.data.stageId) {
+      await updateStageVersion(response.data.stageId);
+    }
     return handleResponse(response);
   } catch (error) {
     return handleError(error);
@@ -110,9 +118,6 @@ const validateMany = async (data, create = true) => {
   if (create) {
     await matchCreateManySchema.validateAsync(data);
   }
-  // } else {
-  //   await matchUpdateSchema.validateAsync(data);
-  // }
 };
 const validateId = async (data) => {
   await idSchema.validateAsync(data);

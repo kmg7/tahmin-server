@@ -1,6 +1,7 @@
 const model = require('./tournament_model');
 const modelError = require('../../../errors/model_error');
 const Joi = require('joi');
+const { updateTournamentVersion, deleteTournamentVersion } = require('../../status/status_service');
 
 const searchTournaments = async (data) => {
   try {
@@ -147,6 +148,25 @@ const createManyTournament = async (data) => {
     return handleError(error);
   }
 };
+const changeActivity = async (data) => {
+  try {
+    await validateId(data.id);
+    await Joi.boolean().required().validateAsync(data.activity);
+    const response = await model.changeTournamentActivity(data.id, data.activity);
+    if (!response.success) {
+      return {
+        success: false,
+        error: response.error,
+      };
+    }
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error) {
+    return handleError(error);
+  }
+};
 const connectStages = async (data) => {
   try {
     await validateId(data.id);
@@ -219,6 +239,7 @@ const idArraySchema = Joi.array().items(idSchema).min(2).required();
 const tournamentCreateSchema = Joi.object({
   id: Joi.string().required(),
   name: Joi.string().min(2).max(32).required(),
+  active: Joi.boolean().required(),
   shName: Joi.string().required(),
   logoUrl: Joi.string().required(),
 });
@@ -232,6 +253,7 @@ const tournamentUpdateSchema = Joi.object({
 const tournamentCreateManySchema = Joi.array().items(tournamentCreateSchema).min(2);
 
 module.exports = {
+  changeActivity,
   searchTournaments,
   createTournament,
   createManyTournament,
