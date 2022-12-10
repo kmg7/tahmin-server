@@ -50,7 +50,7 @@ const getUser = async (req, res) => {
   }
 };
 const getAllUsers = async (req, res) => {
-  const response = await service.getAllUsers();
+  const response = await service.getAllUsers(req.body);
   if (response.success) {
     res.status(StatusCodes.OK).json(response);
   } else {
