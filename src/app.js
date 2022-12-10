@@ -1,4 +1,5 @@
 require('dotenv').config();
+require('./utils/authentication').initializeAuthService();
 const express = require('express');
 const app = express();
 const vermodel = require('./components/status/status_model');
@@ -18,8 +19,7 @@ app.get('/', (req, res) => {
   vermodel.readVersion();
   res.send('done');
 });
-app.get('/debug', (req, res) => {
-  debug.updateStageVersion();
+app.get('/debug', (req, res, next) => {
   res.send('done');
 });
 const start = async () => {
