@@ -15,12 +15,15 @@ const searchUser = async (data) => {
         where: { [data.user.where]: { startsWith: data.user.value } },
         select: data.select,
         orderBy: { [data.sort.field]: data.sort.order },
+        skip: data.pagination.skip,
+        take: data.pagination.take,
       })
     );
   } catch (error) {
     return handleError(error);
   }
 };
+
 const getAllUsers = async (data) => {
   try {
     await validate({ schema: userSortSchema, data: data, field: 'sort' });
@@ -31,13 +34,15 @@ const getAllUsers = async (data) => {
         model: user,
         select: data.select,
         orderBy: { [data.sort.field]: data.sort.order },
+        skip: data.pagination.skip,
+        take: data.pagination.take,
       })
     );
   } catch (error) {
-    console.log(error);
     return handleError(error);
   }
 };
+
 const createUser = async (data) => {
   try {
     await validate({ schema: userCreateSchema, data: data, field: 'user' });
@@ -53,6 +58,7 @@ const createUser = async (data) => {
     return handleError(error);
   }
 };
+
 const getUser = async (data) => {
   try {
     await validate({ schema: userFindSchema, data: data, field: 'user' });
@@ -61,12 +67,14 @@ const getUser = async (data) => {
       await dbModel.get({
         model: user,
         where: { [data.user.where]: data.user.value },
+        select: data.select,
       })
     );
   } catch (error) {
     return handleError(error);
   }
 };
+
 const updateUser = async (data) => {
   try {
     await validate({ schema: userFindSchema, data: data, field: 'user' });
@@ -84,6 +92,7 @@ const updateUser = async (data) => {
     return handleError(error);
   }
 };
+
 const deleteUser = async (data) => {
   try {
     await validate({ schema: userFindSchema, data: data, field: 'user' });
@@ -99,6 +108,7 @@ const deleteUser = async (data) => {
     return handleError(error);
   }
 };
+
 const deleteManyUser = async (data) => {
   try {
     await validate({ schema: userFindManySchema, data: data, field: 'users' });
@@ -112,6 +122,7 @@ const deleteManyUser = async (data) => {
     return handleError(error);
   }
 };
+
 const createManyUser = async (data) => {
   try {
     await validate({ schema: userCreateManySchema, data: data, field: 'users' });
@@ -126,6 +137,7 @@ const createManyUser = async (data) => {
     return handleError(error);
   }
 };
+
 const handleResponse = (response) => {
   if (!response.success) {
     return {
@@ -138,6 +150,7 @@ const handleResponse = (response) => {
     data: response.data,
   };
 };
+
 const handleError = (error) => {
   if (error.isValidation) {
     return {
@@ -155,43 +168,51 @@ const handleError = (error) => {
     success: false,
   };
 };
+
 const validate = async ({ schema, data, field }) => {
   if (!data[field]) {
     throw { isValidation: true, meta: `${field}` };
   }
   await schema.validateAsync(data[field]);
 };
+
 const paginationSchema = Joi.object({
   skip: Joi.number().integer().min(0),
   take: Joi.number().integer().min(5).max(100).required(),
 });
+
 const userSortSchema = Joi.object({
-  field: Joi.string().allow('username', 'email', 'createdAt', 'updatedAt').required(),
+  field: Joi.string().allow('username', 'email', 'createdAt', 'updatedAt', 'role').required(),
   order: Joi.string().allow('asc', 'desc').required(),
 }).required();
+
 const userFindSchema = Joi.object({
   where: Joi.string().allow('username', 'email', 'authId', 'id').required(),
   value: Joi.string().min(2).required(),
 }).required();
+
 const userFindManySchema = Joi.object({
-  where: Joi.string().allow('username', 'email', 'authId', 'id').required(),
+  where: Joi.string().allow('username', 'email', 'authId', 'id', 'role').required(),
   values: Joi.array().items(Joi.string().min(2)).min(1).required(),
 });
+
 const userSelectSchema = Joi.object({
-  id: Joi.boolean().default(false),
-  authId: Joi.boolean().default(false),
-  username: Joi.boolean().default(true),
-  email: Joi.boolean().default(true),
-  password: Joi.boolean().default(false),
-  createdAt: Joi.boolean().default(false),
-  updatedAt: Joi.boolean().default(false),
-  scores: Joi.boolean().default(true),
-  predictions: Joi.boolean().default(false),
+  id: Joi.boolean(),
+  authId: Joi.boolean(),
+  role: Joi.boolean(),
+  username: Joi.boolean(),
+  email: Joi.boolean(),
+  password: Joi.boolean(),
+  createdAt: Joi.boolean(),
+  updatedAt: Joi.boolean(),
+  scores: Joi.boolean(),
+  predictions: Joi.boolean(),
 }).required();
 
 const userCreateSchema = Joi.object({
   id: Joi.string(),
   authId: Joi.string().required(),
+  role: Joi.string(),
   username: Joi.string().min(2).max(32).required(),
   email: Joi.string().email().required(),
   password: Joi.string().required(),
@@ -200,10 +221,12 @@ const userCreateSchema = Joi.object({
 const userUpdateSchema = Joi.object({
   id: Joi.string(),
   authId: Joi.string(),
+  role: Joi.string(),
   username: Joi.string().min(2).max(32),
   email: Joi.string().email(),
   password: Joi.string(),
 });
+
 const userCreateManySchema = Joi.array().items(userCreateSchema).min(1);
 
 module.exports = {
