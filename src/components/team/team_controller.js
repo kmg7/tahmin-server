@@ -50,7 +50,7 @@ const getTeam = async (req, res) => {
   }
 };
 const getAllTeams = async (req, res) => {
-  const response = await service.getAllTeams();
+  const response = await service.getAllTeams(req.body);
   if (response.success) {
     res.status(StatusCodes.OK).json(response);
   } else {
