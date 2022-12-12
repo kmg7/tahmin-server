@@ -9,6 +9,7 @@ const Models = {
   SCORE: dbClient.score,
   STANDINGS: dbClient.standings,
   TEAM: dbClient.team,
+  COUNTRY: dbClient.country,
   USER: dbClient.user,
 };
 const dbModel = require('./db_model');

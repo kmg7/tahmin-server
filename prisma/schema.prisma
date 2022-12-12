@@ -38,6 +38,7 @@ model Country {
   id          String       @unique
   code        String       @unique
   name        String
+  logoUrl     String
   tournaments Tournament[]
   teams       Team[]
 }
