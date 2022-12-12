@@ -1,78 +1,143 @@
-const model = require('./standings_model');
+const { dbModel, Models } = require('../../utils/database');
+const standings = Models.STANDINGS;
 const modelError = require('../../errors/model_error');
 const Joi = require('joi');
+
 const searchStandings = async (data) => {
   try {
-    await validateId(data.id);
-    const response = await model.searchStandings(data.id);
-    return handleResponse(response);
+    await validate({ schema: standingsFindSchema, data: data, field: 'standings' });
+    await validate({ schema: standingsortSchema, data: data, field: 'sort' });
+    await validate({ schema: standingSelectSchema, data: data, field: 'select' });
+    await validate({ schema: paginationSchema, data: data, field: 'pagination' });
+    return handleResponse(
+      await dbModel.getMany({
+        model: standings,
+        where: { [data.standings.where]: { startsWith: data.standings.value } },
+        select: data.select,
+        orderBy: { [data.sort.field]: data.sort.order },
+        skip: data.pagination.skip,
+        take: data.pagination.take,
+      })
+    );
   } catch (error) {
     return handleError(error);
   }
 };
-const getAllStandings = async () => {
+
+const getAllStandings = async (data) => {
   try {
-    const response = await model.getAllStandings();
-    return handleResponse(response);
+    await validate({ schema: standingsortSchema, data: data, field: 'sort' });
+    await validate({ schema: standingSelectSchema, data: data, field: 'select' });
+    await validate({ schema: paginationSchema, data: data, field: 'pagination' });
+    return handleResponse(
+      await dbModel.getMany({
+        model: standings,
+        select: data.select,
+        orderBy: { [data.sort.field]: data.sort.order },
+        skip: data.pagination.skip,
+        take: data.pagination.take,
+      })
+    );
   } catch (error) {
     return handleError(error);
   }
 };
+
 const createStandings = async (data) => {
   try {
-    await validate(data.standings);
-    const response = await model.createStandings(data.standings);
-    return handleResponse(response);
+    await validate({ schema: standingsCreateSchema, data: data, field: 'standings' });
+    await validate({ schema: standingSelectSchema, data: data, field: 'select' });
+    return handleResponse(
+      await dbModel.create({
+        model: standings,
+        select: data.select,
+        data: data.standings,
+      })
+    );
   } catch (error) {
     return handleError(error);
   }
 };
+
 const getStandings = async (data) => {
   try {
-    await validateId(data.id);
-    const response = await model.getStandings(data.id);
-    return handleResponse(response);
+    await validate({ schema: standingsFindSchema, data: data, field: 'standings' });
+    await validate({ schema: standingSelectSchema, data: data, field: 'select' });
+    return handleResponse(
+      await dbModel.get({
+        model: standings,
+        where: { [data.standings.where]: data.standings.value },
+        select: data.select,
+      })
+    );
   } catch (error) {
     return handleError(error);
   }
 };
+
 const updateStandings = async (data) => {
   try {
-    await validateId(data.id);
-    await validate(data.standings, false);
-    const response = await model.updateStandings(data.id, data.standings);
-    return handleResponse(response);
+    await validate({ schema: standingsFindSchema, data: data, field: 'standings' });
+    await validate({ schema: standingSelectSchema, data: data, field: 'select' });
+    await validate({ schema: standingsUpdateSchema, data: data, field: 'update' });
+    return handleResponse(
+      await dbModel.update({
+        model: standings,
+        where: { [data.standings.where]: data.standings.value },
+        data: data.update,
+        select: data.select,
+      })
+    );
   } catch (error) {
     return handleError(error);
   }
 };
+
 const deleteStandings = async (data) => {
   try {
-    await validateId(data.id);
-    const response = await model.deleteStandings(data.id);
-    return handleResponse(response);
+    await validate({ schema: standingsFindSchema, data: data, field: 'standings' });
+    await validate({ schema: standingSelectSchema, data: data, field: 'select' });
+    return handleResponse(
+      await dbModel.remove({
+        model: standings,
+        where: { [data.standings.where]: data.standings.value },
+        select: data.select,
+      })
+    );
   } catch (error) {
     return handleError(error);
   }
 };
+
 const deleteManyStandings = async (data) => {
   try {
-    await validateIds(data.ids);
-    const response = await model.deleteManyStandings(data.ids);
-    return handleResponse(response);
+    await validate({ schema: standingsFindManySchema, data: data, field: 'standings' });
+    return handleResponse(
+      await dbModel.removeMany({
+        model: standings,
+        where: { [data.standings.where]: { in: data.standings.values } },
+      })
+    );
   } catch (error) {
     return handleError(error);
   }
 };
+
 const createManyStandings = async (data) => {
   try {
-    await validateMany(data.standings);
-    const response = await model.createManyStandings(data.standings);
-    return handleResponse(response);
+    await validate({ schema: standingsCreateManySchema, data: data, field: 'standings' });
+    return handleResponse(
+      await dbModel.createMany({
+        model: standings,
+        data: data.standings,
+        select: data.select,
+      })
+    );
   } catch (error) {
     return handleError(error);
   }
 };
+
 const handleResponse = (response) => {
   if (!response.success) {
     return {
@@ -85,7 +150,14 @@ const handleResponse = (response) => {
     data: response.data,
   };
 };
+
 const handleError = (error) => {
+  if (error.isValidation) {
+    return {
+      success: false,
+      error: modelError.NOT_PROVIDED(error.meta),
+    };
+  }
   if (error.isJoi) {
     return {
       success: false,
@@ -96,24 +168,40 @@ const handleError = (error) => {
     success: false,
   };
 };
-const validate = async (standings, iscreate = true) => {
-  if (iscreate) {
-    await standingsCreateSchema.validateAsync(standings);
-  } else {
-    await standingsUpdateSchema.validateAsync(standings);
+
+const validate = async ({ schema, data, field }) => {
+  if (!data[field]) {
+    throw { isValidation: true, meta: `${field}` };
   }
+  await schema.validateAsync(data[field]);
 };
-const validateMany = async (Standings) => {
-  await StandingsCreateManySchema.validateAsync(Standings);
-};
-const validateId = async (id) => {
-  await idSchema.validateAsync(id);
-};
-const validateIds = async (ids) => {
-  await idArraySchema.validateAsync(ids);
-};
-const idSchema = Joi.string().min(2).max(32).required();
-const idArraySchema = Joi.array().items(idSchema).min(2).required();
+
+const paginationSchema = Joi.object({
+  skip: Joi.number().integer().min(0),
+  take: Joi.number().integer().min(5).max(100).required(),
+});
+
+const standingsortSchema = Joi.object({
+  field: Joi.string().allow('id', 'tournamentId').required(),
+  order: Joi.string().allow('asc', 'desc').required(),
+}).required();
+
+const standingsFindSchema = Joi.object({
+  where: Joi.string().allow('id', 'tournamentId').required(),
+  value: Joi.string().min(2).required(),
+}).required();
+
+const standingsFindManySchema = Joi.object({
+  where: Joi.string().allow('id', 'tournamentId').required(),
+  values: Joi.array().items(Joi.string().min(2)).min(1).required(),
+});
+
+const standingSelectSchema = Joi.object({
+  id: Joi.boolean(),
+  tournamentId: Joi.boolean(),
+  tournament: Joi.boolean(),
+  scores: Joi.boolean(),
+}).required();
 
 const standingsCreateSchema = Joi.object({
   id: Joi.string().required(),
@@ -124,7 +212,8 @@ const standingsUpdateSchema = Joi.object({
   id: Joi.string(),
   tournamentId: Joi.string(),
 });
-const StandingsCreateManySchema = Joi.array().items(standingsCreateSchema).min(2);
+
+const standingsCreateManySchema = Joi.array().items(standingsCreateSchema).min(1);
 
 module.exports = {
   searchStandings,
