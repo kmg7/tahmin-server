@@ -215,7 +215,7 @@ const userCreateSchema = Joi.object({
   role: Joi.string(),
   username: Joi.string().min(2).max(32).required(),
   email: Joi.string().email().required(),
-  password: Joi.string().required(),
+  password: Joi.string(),
 });
 
 const userUpdateSchema = Joi.object({

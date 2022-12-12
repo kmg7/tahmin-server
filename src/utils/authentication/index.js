@@ -11,15 +11,47 @@ const initializeAuthService = () =>
     }),
     databaseURL: process.env.FIREBASE_DATABASE_URL,
   });
-
 const validateToken = async ({ token }) => {
   try {
     const response = await admin.auth().verifyIdToken(token);
-    console.log(response);
+    return {
+      valid: true,
+      user: response,
+    };
   } catch (error) {
-    console.log(error);
+    return { valid: false, error: handleError(error) };
   }
-  return 1;
+};
+const handleError = (error) => {
+  if (error.code === 'auth/id-token-expired') {
+    return {
+      code: 401,
+      message: 'Token expired',
+    };
+  }
+  if (error.code === 'auth/argument-error') {
+    return {
+      code: 400,
+      message: 'Invalid JWT',
+    };
+  }
+  if (error.code === 'auth/invalid-id-token') {
+    return {
+      code: 401,
+      message: 'Invalid token',
+    };
+  }
+  if (error.code === 'auth/revoked-id-token') {
+    return {
+      code: 401,
+      message: 'Token revoked',
+    };
+  }
+  console.log(error);
+  return {
+    code: 500,
+    message: 'Unexpected internal error',
+  };
 };
 
 module.exports = { initializeAuthService, validateToken };
