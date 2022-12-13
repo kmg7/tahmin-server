@@ -9,7 +9,7 @@ CREATE TABLE [dbo].[User] (
     [username] NVARCHAR(1000) NOT NULL,
     [email] NVARCHAR(1000) NOT NULL,
     [role] NVARCHAR(1000) NOT NULL CONSTRAINT [User_role_df] DEFAULT 'NOT_VERIFIED',
-    [password] NVARCHAR(1000) NOT NULL,
+    [password] NVARCHAR(1000) NOT NULL CONSTRAINT [User_password_df] DEFAULT 'NOT_STORED',
     [createdAt] DATETIME2 NOT NULL CONSTRAINT [User_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
     [updatedAt] DATETIME2 NOT NULL,
     CONSTRAINT [User_pkey] PRIMARY KEY CLUSTERED ([id]),
@@ -26,7 +26,8 @@ CREATE TABLE [dbo].[Team] (
     [logoUrl] NVARCHAR(1000) NOT NULL,
     [countryCode] NVARCHAR(1000) NOT NULL,
     CONSTRAINT [Team_pkey] PRIMARY KEY CLUSTERED ([id]),
-    CONSTRAINT [Team_id_key] UNIQUE NONCLUSTERED ([id])
+    CONSTRAINT [Team_id_key] UNIQUE NONCLUSTERED ([id]),
+    CONSTRAINT [Team_countryCode_code_key] UNIQUE NONCLUSTERED ([countryCode],[code])
 );
 
 -- CreateTable
@@ -34,6 +35,7 @@ CREATE TABLE [dbo].[Country] (
     [id] NVARCHAR(1000) NOT NULL,
     [code] NVARCHAR(1000) NOT NULL,
     [name] NVARCHAR(1000) NOT NULL,
+    [logoUrl] NVARCHAR(1000) NOT NULL,
     CONSTRAINT [Country_id_key] UNIQUE NONCLUSTERED ([id]),
     CONSTRAINT [Country_code_key] UNIQUE NONCLUSTERED ([code])
 );
@@ -70,6 +72,7 @@ CREATE TABLE [dbo].[Match] (
     [homeTeamId] NVARCHAR(1000),
     [awayTeamId] NVARCHAR(1000),
     [stageId] NVARCHAR(1000),
+    [dateTime] DATETIME2 NOT NULL,
     CONSTRAINT [Match_pkey] PRIMARY KEY CLUSTERED ([id]),
     CONSTRAINT [Match_id_key] UNIQUE NONCLUSTERED ([id])
 );
@@ -140,7 +143,7 @@ ALTER TABLE [dbo].[MatchScore] ADD CONSTRAINT [MatchScore_stageId_fkey] FOREIGN 
 ALTER TABLE [dbo].[Prediction] ADD CONSTRAINT [Prediction_matchId_fkey] FOREIGN KEY ([matchId]) REFERENCES [dbo].[Match]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE [dbo].[Prediction] ADD CONSTRAINT [Prediction_userId_fkey] FOREIGN KEY ([userId]) REFERENCES [dbo].[User]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
+ALTER TABLE [dbo].[Prediction] ADD CONSTRAINT [Prediction_userId_fkey] FOREIGN KEY ([userId]) REFERENCES [dbo].[User]([authId]) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE [dbo].[Standings] ADD CONSTRAINT [Standings_tournamentId_fkey] FOREIGN KEY ([tournamentId]) REFERENCES [dbo].[Tournament]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;

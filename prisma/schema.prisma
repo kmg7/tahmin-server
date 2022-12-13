@@ -74,6 +74,7 @@ model Match {
   homeTeamId  String?
   awayTeamId  String?
   stageId     String?
+  dateTime    DateTime
   predictions Prediction[]
   stage       Stage?       @relation(fields: [stageId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   homeTeam    Team?        @relation("homeMatches", fields: [homeTeamId], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -98,7 +99,7 @@ model Prediction {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   match     Match    @relation(fields: [matchId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [authId])
 
   @@unique([matchId, userId])
 }
