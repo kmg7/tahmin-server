@@ -58,7 +58,7 @@ const getTournament = async (req, res) => {
   }
 };
 const getAllTournaments = async (req, res) => {
-  const response = await service.getAllTournaments();
+  const response = await service.getAllTournaments(req.body);
   if (response.success) {
     res.status(StatusCodes.OK).json(response);
   } else {
@@ -66,29 +66,14 @@ const getAllTournaments = async (req, res) => {
   }
 };
 const searchTournament = async (req, res) => {
-  const response = await service.searchTournaments(req.body);
+  const response = await service.searchTournament(req.body);
   if (response.success) {
     res.status(StatusCodes.OK).json(response);
   } else {
     res.status(StatusCodes.BAD_REQUEST).json(response);
   }
 };
-const connectStages = async (req, res) => {
-  const response = await service.connectStages(req.body);
-  if (response.success) {
-    res.status(StatusCodes.OK).json(response);
-  } else {
-    res.status(StatusCodes.BAD_REQUEST).json(response);
-  }
-};
-const disconnectStages = async (req, res) => {
-  const response = await service.disconnectStages(req.body);
-  if (response.success) {
-    res.status(StatusCodes.OK).json(response);
-  } else {
-    res.status(StatusCodes.BAD_REQUEST).json(response);
-  }
-};
+
 module.exports = {
   changeActivity,
   createTournament,
@@ -99,6 +84,4 @@ module.exports = {
   getTournament,
   getAllTournaments,
   searchTournament,
-  connectStages,
-  disconnectStages,
 };

@@ -1,75 +1,83 @@
-const model = require('./tournament_model');
+const { dbModel, Models } = require('../../../utils/database');
 const modelError = require('../../../errors/model_error');
+const tournament = Models.TOURNAMENT;
 const Joi = require('joi');
-const { updateTournamentVersion, deleteTournamentVersion } = require('../../status/status_service');
 
-const searchTournaments = async (data) => {
+const searchTournament = async (data) => {
   try {
-    await validateId(data.id);
-    const response = await model.searchTournaments(data.id);
-    if (!response.success) {
-      return {
-        success: false,
-        error: response.error,
-      };
-    }
-    return {
-      success: true,
-      data: response.data,
-    };
+    await validate({ schema: tournamentSearchSchema, data: data, field: 'tournament' });
+    await validate({ schema: tournamentSortSchema, data: data, field: 'sort' });
+    await validate({ schema: tournamentSelectSchema, data: data, field: 'select' });
+    await validate({ schema: paginationSchema, data: data, field: 'pagination' });
+    return handleResponse(
+      await dbModel.getMany({
+        model: tournament,
+        where: {
+          AND: data.tournament.map(({ where, value }) => {
+            if (typeof value === 'boolean') {
+              return { [where]: value };
+            } else {
+              return { [where]: { startsWith: value } };
+            }
+          }),
+        },
+        select: data.select,
+        orderBy: { [data.sort.field]: data.sort.order },
+        skip: data.pagination.skip,
+        take: data.pagination.take,
+      })
+    );
   } catch (error) {
     return handleError(error);
   }
 };
-const getAllTournaments = async () => {
+
+const getAllTournaments = async (data) => {
   try {
-    const response = await model.getAllTournaments();
-    if (!response.success) {
-      return {
-        success: false,
-        error: response.error,
-      };
-    }
-    return {
-      success: true,
-      data: response.data,
-    };
+    await validate({ schema: tournamentSortSchema, data: data, field: 'sort' });
+    await validate({ schema: tournamentSelectSchema, data: data, field: 'select' });
+    await validate({ schema: paginationSchema, data: data, field: 'pagination' });
+    return handleResponse(
+      await dbModel.getMany({
+        model: tournament,
+        select: data.select,
+        orderBy: { [data.sort.field]: data.sort.order },
+        skip: data.pagination.skip,
+        take: data.pagination.take,
+      })
+    );
   } catch (error) {
     return handleError(error);
   }
 };
 const createTournament = async (data) => {
   try {
-    await validate(data.tournament);
-    const response = await model.createTournament(data.tournament);
-    if (!response.success) {
-      return {
-        success: false,
-        error: response.error,
-      };
+    await validate({ schema: tournamentCreateSchema, data: data, field: 'tournament' });
+    await validate({ schema: tournamentSelectSchema, data: data, field: 'select' });
+    const response = await dbModel.create({
+      model: tournament,
+      select: data.select,
+      data: data.tournament,
+    });
+    if (response.success && response.data.tournamentId) {
+      await updatetournamentVersion(response.data.tournamentId);
     }
-    return {
-      success: true,
-      data: response.data,
-    };
+    return handleResponse(response);
   } catch (error) {
     return handleError(error);
   }
 };
 const getTournament = async (data) => {
   try {
-    await validateId(data.id);
-    const response = await model.getTournament(data.id);
-    if (!response.success) {
-      return {
-        success: false,
-        error: response.error,
-      };
-    }
-    return {
-      success: true,
-      data: response.data,
-    };
+    await validate({ schema: tournamentFindSchema, data: data, field: 'tournament' });
+    await validate({ schema: tournamentSelectSchema, data: data, field: 'select' });
+    return handleResponse(
+      await dbModel.get({
+        model: tournament,
+        where: { [data.tournament.where]: data.tournament.value },
+        select: data.select,
+      })
+    );
   } catch (error) {
     return handleError(error);
   }
@@ -77,135 +85,85 @@ const getTournament = async (data) => {
 
 const updateTournament = async (data) => {
   try {
-    await validateId(data.id);
-    await validate(data.tournament, false);
-    const response = await model.updateTournament(data.id, data.tournament);
-    if (!response.success) {
-      return {
-        success: false,
-        error: response.error,
-      };
-    }
-    return {
-      success: true,
-      data: response.data,
-    };
+    await validate({ schema: tournamentFindSchema, data: data, field: 'tournament' });
+    await validate({ schema: tournamentSelectSchema, data: data, field: 'select' });
+    await validate({ schema: tournamentUpdateSchema, data: data, field: 'update' });
+    return handleResponse(
+      await dbModel.update({
+        model: tournament,
+        where: { [data.tournament.where]: data.tournament.value },
+        data: data.update,
+        select: data.select,
+      })
+    );
   } catch (error) {
     return handleError(error);
   }
 };
+
 const deleteTournament = async (data) => {
   try {
-    await validateId(data.id);
-    const response = await model.deleteTournament(data.id);
-    if (!response.success) {
-      return {
-        success: false,
-        error: response.error,
-      };
-    }
-    return {
-      success: true,
-      data: response.data,
-    };
+    await validate({ schema: tournamentFindSchema, data: data, field: 'tournament' });
+    await validate({ schema: tournamentSelectSchema, data: data, field: 'select' });
+    return handleResponse(
+      await dbModel.remove({
+        model: tournament,
+        where: { [data.tournament.where]: data.tournament.value },
+        select: data.select,
+      })
+    );
   } catch (error) {
     return handleError(error);
   }
 };
+
 const deleteManyTournament = async (data) => {
   try {
-    await validateIds(data.ids);
-    const response = await model.deleteManyTournament(data.ids);
-    if (!response.success) {
-      return {
-        success: false,
-        error: response.error,
-      };
-    }
-    return {
-      success: true,
-      data: response.data,
-    };
+    await validate({ schema: tournamentFindManySchema, data: data, field: 'tournaments' });
+    return handleResponse(
+      await dbModel.removeMany({
+        model: tournament,
+        where: { [data.tournaments.where]: { in: data.tournaments.values } },
+      })
+    );
   } catch (error) {
     return handleError(error);
   }
 };
+
 const createManyTournament = async (data) => {
   try {
-    await validateMany(data.tournaments);
-    const response = await model.createManyTournament(data.tournaments);
-    if (!response.success) {
-      return {
-        success: false,
-        error: response.error,
-      };
-    }
-    return {
-      success: true,
-      data: response.data,
-    };
+    await validate({ schema: tournamentCreateManySchema, data: data, field: 'tournaments' });
+    return handleResponse(
+      await dbModel.createMany({
+        model: tournament,
+        data: data.tournaments,
+      })
+    );
   } catch (error) {
     return handleError(error);
   }
 };
-const changeActivity = async (data) => {
-  try {
-    await validateId(data.id);
-    await Joi.boolean().required().validateAsync(data.activity);
-    const response = await model.changeTournamentActivity(data.id, data.activity);
-    if (!response.success) {
-      return {
-        success: false,
-        error: response.error,
-      };
-    }
+const handleResponse = (response) => {
+  if (!response.success) {
     return {
-      success: true,
-      data: response.data,
+      success: false,
+      error: response.error,
     };
-  } catch (error) {
-    return handleError(error);
   }
+  return {
+    success: true,
+    data: response.data,
+  };
 };
-const connectStages = async (data) => {
-  try {
-    await validateId(data.id);
-    await validateIds(data.stages);
-    const response = await model.connectStages(data.id, data.stages);
-    if (!response.success) {
-      return {
-        success: false,
-        error: response.error,
-      };
-    }
-    return {
-      success: true,
-      data: response.data,
-    };
-  } catch (error) {
-    return handleError(error);
-  }
-};
-const disconnectStages = async (data) => {
-  try {
-    await validateId(data.id);
-    await validateIds(data.stages);
-    const response = await model.disconnectStages(data.id, data.stages);
-    if (!response.success) {
-      return {
-        success: false,
-        error: response.error,
-      };
-    }
-    return {
-      success: true,
-      data: response.data,
-    };
-  } catch (error) {
-    return handleError(error);
-  }
-};
+
 const handleError = (error) => {
+  if (error.isValidation) {
+    return {
+      success: false,
+      error: modelError.NOT_PROVIDED(error.meta),
+    };
+  }
   if (error.isJoi) {
     return {
       success: false,
@@ -217,44 +175,77 @@ const handleError = (error) => {
   };
 };
 
-const validate = async (tournament, iscreate = true) => {
-  if (iscreate) {
-    await tournamentCreateSchema.validateAsync(tournament);
-  } else {
-    await tournamentUpdateSchema.validateAsync(tournament);
+const validate = async ({ schema, data, field }) => {
+  if (!data[field]) {
+    throw { isValidation: true, meta: `${field}` };
   }
+  await schema.validateAsync(data[field]);
 };
-const validateMany = async (tournaments) => {
-  await tournamentCreateManySchema.validateAsync(tournaments);
-};
-const validateId = async (id) => {
-  await idSchema.validateAsync(id);
-};
-const validateIds = async (ids) => {
-  await idArraySchema.validateAsync(ids);
-};
-const idSchema = Joi.string().min(2).max(32).required();
-const idArraySchema = Joi.array().items(idSchema).min(2).required();
+const paginationSchema = Joi.object({
+  skip: Joi.number().integer().min(0),
+  take: Joi.number().integer().min(5).max(100).required(),
+});
+
+const tournamentSortSchema = Joi.object({
+  field: Joi.string().allow('countryCode', 'id', 'active', 'name', 'code').required(),
+  order: Joi.string().allow('asc', 'desc').required(),
+}).required();
+
+const tournamentSearchSchema = Joi.array()
+  .items(
+    Joi.object({
+      where: Joi.string().allow('countryCode', 'id', 'active', 'name', 'code').required(),
+      value: Joi.when('where', { is: 'active', then: Joi.boolean(), otherwise: Joi.string().min(2) }).required(),
+    })
+  )
+  .min(1);
+
+const tournamentFindSchema = Joi.object({
+  where: Joi.string().allow('id').required(),
+  value: Joi.string().min(2).required(),
+});
+const tournamentFindManySchema = Joi.object({
+  where: Joi.string().allow('id').required(),
+  values: Joi.array().items(Joi.string().min(2)).min(1).required(),
+});
+
+const tournamentSelectSchema = Joi.object({
+  id: Joi.boolean(),
+  name: Joi.boolean(),
+  countryCode: Joi.boolean(),
+  active: Joi.boolean(),
+  code: Joi.boolean(),
+  logoUrl: Joi.boolean(),
+  createdAt: Joi.boolean(),
+  updatedAt: Joi.boolean(),
+  stages: Joi.boolean(),
+  standings: Joi.boolean(),
+  country: Joi.boolean(),
+}).required();
 
 const tournamentCreateSchema = Joi.object({
   id: Joi.string().required(),
   name: Joi.string().min(2).max(32).required(),
+  countryCode: Joi.string().required(),
   active: Joi.boolean().required(),
-  shName: Joi.string().required(),
+  code: Joi.string().required(),
   logoUrl: Joi.string().required(),
-});
+}).required();
 
 const tournamentUpdateSchema = Joi.object({
   id: Joi.string(),
   name: Joi.string().min(2).max(32),
-  shName: Joi.string(),
+  countryCode: Joi.string(),
+  active: Joi.boolean(),
+  code: Joi.string(),
   logoUrl: Joi.string(),
-});
-const tournamentCreateManySchema = Joi.array().items(tournamentCreateSchema).min(2);
+  updatedAt: Joi.date().iso(),
+}).required();
+
+const tournamentCreateManySchema = Joi.array().items(tournamentCreateSchema).min(2).required();
 
 module.exports = {
-  changeActivity,
-  searchTournaments,
+  searchTournament,
   createTournament,
   createManyTournament,
   getTournament,
@@ -262,6 +253,4 @@ module.exports = {
   deleteTournament,
   deleteManyTournament,
   updateTournament,
-  connectStages,
-  disconnectStages,
 };
