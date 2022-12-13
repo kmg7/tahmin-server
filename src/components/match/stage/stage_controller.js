@@ -1,14 +1,6 @@
 const service = require('./stage_service');
 const { StatusCodes } = require('http-status-codes');
 
-const changeActivity = async (req, res) => {
-  const response = await service.changeStageActivity(req.body);
-  if (response.success) {
-    res.status(StatusCodes.OK).json(response);
-  } else {
-    res.status(StatusCodes.BAD_REQUEST).json(response);
-  }
-};
 const createStage = async (req, res) => {
   const response = await service.createStage(req.body);
   if (response.success) {
@@ -58,7 +50,7 @@ const getStage = async (req, res) => {
   }
 };
 const getAllStages = async (req, res) => {
-  const response = await service.getAllStages();
+  const response = await service.getAllStages(req.body);
   if (response.success) {
     res.status(StatusCodes.OK).json(response);
   } else {
@@ -73,24 +65,7 @@ const searchStage = async (req, res) => {
     res.status(StatusCodes.BAD_REQUEST).json(response);
   }
 };
-const connectMatches = async (req, res) => {
-  const response = await service.connectMatches(req.body);
-  if (response.success) {
-    res.status(StatusCodes.OK).json(response);
-  } else {
-    res.status(StatusCodes.BAD_REQUEST).json(response);
-  }
-};
-const disconnectMatches = async (req, res) => {
-  const response = await service.disconnectMatches(req.body);
-  if (response.success) {
-    res.status(StatusCodes.OK).json(response);
-  } else {
-    res.status(StatusCodes.BAD_REQUEST).json(response);
-  }
-};
 module.exports = {
-  changeActivity,
   createStage,
   createManyStage,
   getStage,
@@ -99,6 +74,4 @@ module.exports = {
   deleteManyStage,
   deleteStage,
   updateStage,
-  connectMatches,
-  disconnectMatches,
 };

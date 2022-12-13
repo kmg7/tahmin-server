@@ -1,224 +1,173 @@
-const Joi = require('joi');
-const { string } = require('../../../utils/validators');
-const model = require('./stage_model');
+const { dbModel, Models } = require('../../../utils/database');
 const modelError = require('../../../errors/model_error');
-const { updateTournamentVersion } = require('../tournament/tournament_model');
+const stage = Models.STAGE;
+const Joi = require('joi');
+
 const searchStage = async (data) => {
   try {
-    await validateId(data.id);
-    const response = await model.searchStage(data.id);
-    if (!response.success) {
-      return {
-        success: false,
-        error: response.error,
-      };
-    }
-    return {
-      success: true,
-      data: response.data,
-    };
+    await validate({ schema: stageSearchSchema, data: data, field: 'stage' });
+    await validate({ schema: stageSortSchema, data: data, field: 'sort' });
+    await validate({ schema: stageSelectSchema, data: data, field: 'select' });
+    await validate({ schema: paginationSchema, data: data, field: 'pagination' });
+    return handleResponse(
+      await dbModel.getMany({
+        model: stage,
+        where: {
+          AND: data.stage.map(({ where, value }) => {
+            if (typeof value === 'boolean') {
+              return { [where]: value };
+            } else {
+              return { [where]: { startsWith: value } };
+            }
+          }),
+        },
+        select: data.select,
+        orderBy: { [data.sort.field]: data.sort.order },
+        skip: data.pagination.skip,
+        take: data.pagination.take,
+      })
+    );
   } catch (error) {
     return handleError(error);
   }
 };
+
+const getAllStages = async (data) => {
+  try {
+    await validate({ schema: stageSortSchema, data: data, field: 'sort' });
+    await validate({ schema: stageSelectSchema, data: data, field: 'select' });
+    await validate({ schema: paginationSchema, data: data, field: 'pagination' });
+    return handleResponse(
+      await dbModel.getMany({
+        model: stage,
+        select: data.select,
+        orderBy: { [data.sort.field]: data.sort.order },
+        skip: data.pagination.skip,
+        take: data.pagination.take,
+      })
+    );
+  } catch (error) {
+    return handleError(error);
+  }
+};
+
 const createStage = async (data) => {
   try {
-    await validate(data.stage);
-    const response = await model.createStage(data.stage);
-    if (!response.success) {
-      return {
-        success: false,
-        error: response.error,
-      };
+    await validate({ schema: stageCreateSchema, data: data, field: 'stage' });
+    await validate({ schema: stageSelectSchema, data: data, field: 'select' });
+    const response = await dbModel.create({
+      model: stage,
+      select: data.select,
+      data: data.stage,
+    });
+    if (response.success && response.data.stageId) {
+      await updateStageVersion(response.data.stageId);
     }
-    if (response.data.active && response.data.tournamentId) {
-      await updateTournamentVersion(response.data.tournamentId);
-    }
-    return {
-      success: true,
-      data: response.data,
-    };
+    return handleResponse(response);
   } catch (error) {
     return handleError(error);
   }
 };
+
 const getStage = async (data) => {
   try {
-    await validateId(data.id);
-    const response = await model.getStage(data.id);
-    if (!response.success) {
-      return {
-        success: false,
-        error: response.error,
-      };
-    }
-    return {
-      success: true,
-      data: response.data,
-    };
+    await validate({ schema: stageFindSchema, data: data, field: 'stage' });
+    await validate({ schema: stageSelectSchema, data: data, field: 'select' });
+    return handleResponse(
+      await dbModel.get({
+        model: stage,
+        where: { [data.stage.where]: data.stage.value },
+        select: data.select,
+      })
+    );
   } catch (error) {
     return handleError(error);
   }
 };
+
 const updateStage = async (data) => {
   try {
-    await validateId(data.id);
-    await validate(data.stage);
-    const response = await model.updateStage(data.id, data.stage);
-    if (!response.success) {
-      return {
-        success: false,
-        error: response.error,
-      };
-    }
-    if (response.data.active && response.data.tournamentId) {
-      await updateTournamentVersion(response.data.tournamentId);
-    }
-    return {
-      success: true,
-      data: response.data,
-    };
+    await validate({ schema: stageFindSchema, data: data, field: 'stage' });
+    await validate({ schema: stageSelectSchema, data: data, field: 'select' });
+    await validate({ schema: stageUpdateSchema, data: data, field: 'update' });
+    return handleResponse(
+      await dbModel.update({
+        model: stage,
+        where: { [data.stage.where]: data.stage.value },
+        data: data.update,
+        select: data.select,
+      })
+    );
   } catch (error) {
     return handleError(error);
   }
 };
-const changeStageActivity = async (data) => {
-  try {
-    await validateId(data.id);
-    await Joi.boolean().required().validateAsync(data.activity);
-    const response = await model.changeActivity(data.id, data.activity);
-    if (!response.success) {
-      return {
-        success: false,
-        error: response.error,
-      };
-    }
-    if (response.data.tournamentId) {
-      await updateTournamentVersion(response.data.tournamentId);
-    }
-    return {
-      success: true,
-      data: response.data,
-    };
-  } catch (error) {
-    return handleError(error);
-  }
-};
+
 const deleteStage = async (data) => {
   try {
-    await validateId(data.id);
-    const response = await model.deleteStage(data.id);
-    if (!response.success) {
-      return {
-        success: false,
-        error: response.error,
-      };
-    }
-    if (response.data.active && response.data.tournamentId) {
-      await updateTournamentVersion(response.data.tournamentId);
-    }
-    return {
-      success: true,
-      data: response.data,
-    };
+    await validate({ schema: stageFindSchema, data: data, field: 'stage' });
+    await validate({ schema: stageSelectSchema, data: data, field: 'select' });
+    return handleResponse(
+      await dbModel.remove({
+        model: stage,
+        where: { [data.stage.where]: data.stage.value },
+        select: data.select,
+      })
+    );
   } catch (error) {
     return handleError(error);
   }
 };
-const createManyStage = async (data) => {
-  try {
-    await validateMany(data.stages);
-    const response = await model.createManyStage(data.stages);
-    if (!response.success) {
-      return {
-        success: false,
-        error: response.error,
-      };
-    }
-    return {
-      success: true,
-      data: response.data,
-    };
-  } catch (error) {
-    return handleError(error);
-  }
-};
-const getAllStages = async () => {
-  try {
-    const response = await model.getAllStages();
-    if (!response.success) {
-      return {
-        success: false,
-        error: response.error,
-      };
-    }
-    return {
-      success: true,
-      data: response.data,
-    };
-  } catch (error) {
-    return handleError(error);
-  }
-};
+
 const deleteManyStage = async (data) => {
   try {
-    await validateIds(data.ids);
-    const response = await model.deleteManyStage(data.ids);
-    if (!response.success) {
-      return {
-        success: false,
-        error: response.error,
-      };
-    }
-    return {
-      success: true,
-      data: response.data,
-    };
+    await validate({ schema: stageFindManySchema, data: data, field: 'stages' });
+    return handleResponse(
+      await dbModel.removeMany({
+        model: stage,
+        where: { [data.stages.where]: { in: data.stages.values } },
+      })
+    );
   } catch (error) {
     return handleError(error);
   }
 };
-const connectMatches = async (data) => {
+
+const createManyStage = async (data) => {
   try {
-    await validateId(data.id);
-    await validateIds(data.matches);
-    const response = await model.connectMatches(data.id, data.matches);
-    if (!response.success) {
-      return {
-        success: false,
-        error: response.error,
-      };
-    }
-    await model.updateStageVersion(data.id);
-    return {
-      success: true,
-      data: response.data,
-    };
+    await validate({ schema: stageCreateManySchema, data: data, field: 'stages' });
+    return handleResponse(
+      await dbModel.createMany({
+        model: stage,
+        data: data.stages,
+        select: data.select,
+      })
+    );
   } catch (error) {
     return handleError(error);
   }
 };
-const disconnectMatches = async (data) => {
-  try {
-    await validateId(data.id);
-    await validateIds(data.matches);
-    const response = await model.disconnectMatches(data.id, data.matches);
-    if (!response.success) {
-      return {
-        success: false,
-        error: response.error,
-      };
-    }
-    await model.updateStageVersion(data.id);
+
+const handleResponse = (response) => {
+  if (!response.success) {
     return {
-      success: true,
-      data: response.data,
+      success: false,
+      error: response.error,
     };
-  } catch (error) {
-    return handleError(error);
   }
+  return {
+    success: true,
+    data: response.data,
+  };
 };
+
 const handleError = (error) => {
+  if (error.isValidation) {
+    return {
+      success: false,
+      error: modelError.NOT_PROVIDED(error.meta),
+    };
+  }
   if (error.isJoi) {
     return {
       success: false,
@@ -229,46 +178,78 @@ const handleError = (error) => {
     success: false,
   };
 };
-const validate = async (stage, create = true) => {
-  if (create) {
-    await stageCreateSchema.validateAsync(stage);
-  } else {
-    await stageUpdateSchema.validateAsync(stage);
+
+const validate = async ({ schema, data, field }) => {
+  if (!data[field]) {
+    throw { isValidation: true, meta: `${field}` };
   }
+  await schema.validateAsync(data[field]);
 };
-const validateMany = async (stages) => {
-  await stageCreateManySchema.validateAsync(stages);
-};
-const validateId = async (id) => {
-  await idSchema.validateAsync(id);
-};
-const validateIds = async (ids) => {
-  await idArraySchema.validateAsync(ids);
-};
-const idSchema = Joi.string().min(2).max(32).required();
-const idArraySchema = Joi.array().items(idSchema).min(2).required();
+
+const paginationSchema = Joi.object({
+  skip: Joi.number().integer().min(0),
+  take: Joi.number().integer().min(5).max(100).required(),
+});
+
+const stageSortSchema = Joi.object({
+  field: Joi.string().allow('name', 'id', 'tournamentId', 'active').required(),
+  order: Joi.string().allow('asc', 'desc').required(),
+}).required();
+
+const stageSearchSchema = Joi.array()
+  .items(
+    Joi.object({
+      where: Joi.string().allow('active', 'id', 'tournamentId', 'name').required(),
+      value: Joi.when('where', { is: 'active', then: Joi.boolean(), otherwise: Joi.string().min(2) }).required(),
+    }).required()
+  )
+  .required()
+  .min(1);
+
+const stageFindSchema = Joi.object({
+  where: Joi.string().allow('id').required(),
+  value: Joi.string().min(2).required(),
+});
+const stageFindManySchema = Joi.object({
+  where: Joi.string().allow('id').required(),
+  values: Joi.array().items(Joi.string().min(2)).min(1).required(),
+});
+
+const stageSelectSchema = Joi.object({
+  id: Joi.boolean(),
+  active: Joi.boolean(),
+  tournamentId: Joi.boolean(),
+  name: Joi.boolean(),
+  matches: Joi.boolean(),
+  createdAt: Joi.boolean(),
+  updatedAt: Joi.boolean(),
+  matchScores: Joi.boolean(),
+  tournament: Joi.boolean(),
+}).required();
+
 const stageCreateSchema = Joi.object({
-  id: Joi.string().required(),
-  name: Joi.string().required(),
+  id: Joi.string().min(2).required(),
   active: Joi.boolean().required(),
-  tournamentId: Joi.string().required(),
-}).required();
+  name: Joi.string().min(2).required(),
+  tournamentId: Joi.string().min(2).required(),
+});
+
+const stageCreateManySchema = Joi.array().items(stageCreateSchema).min(1).required();
+
 const stageUpdateSchema = Joi.object({
-  id: Joi.string(),
-  name: Joi.string(),
-  tournamentId: Joi.string(),
-}).required();
-const stageCreateManySchema = Joi.array().items(stageCreateSchema).min(2).required();
+  id: Joi.string().min(2),
+  name: Joi.string().min(2),
+  active: Joi.boolean(),
+  tournamentId: Joi.string().min(2),
+  updatedAt: Joi.date().iso(),
+});
 module.exports = {
   searchStage,
-  createStage,
-  createManyStage,
   getStage,
   getAllStages,
+  createStage,
+  createManyStage,
+  updateStage,
   deleteStage,
   deleteManyStage,
-  updateStage,
-  connectMatches,
-  disconnectMatches,
-  changeStageActivity,
 };
