@@ -1,100 +1,145 @@
-const matchModel = require('./match_model');
+const { dbModel, Models } = require('../../../utils/database');
 const modelError = require('../../../errors/model_error');
+const match = Models.MATCH;
 const Joi = require('joi');
-const { updateStageVersion } = require('../stage/stage_model');
+
 const searchMatch = async (data) => {
   try {
-    await validateId(data.id);
-    const response = await matchModel.searchMatch(data.id);
-    return handleResponse(response);
+    await validate({ schema: matchFindSchema, data: data, field: 'match' });
+    await validate({ schema: matchSortSchema, data: data, field: 'sort' });
+    await validate({ schema: matchSelectSchema, data: data, field: 'select' });
+    await validate({ schema: paginationSchema, data: data, field: 'pagination' });
+    return handleResponse(
+      await dbModel.getMany({
+        model: match,
+        where: { [data.match.where]: { startsWith: data.match.value } },
+        select: data.select,
+        orderBy: { [data.sort.field]: data.sort.order },
+        skip: data.pagination.skip,
+        take: data.pagination.take,
+      })
+    );
   } catch (error) {
     return handleError(error);
   }
 };
+
+const getAllMatches = async (data) => {
+  try {
+    await validate({ schema: matchSortSchema, data: data, field: 'sort' });
+    await validate({ schema: matchSelectSchema, data: data, field: 'select' });
+    await validate({ schema: paginationSchema, data: data, field: 'pagination' });
+    return handleResponse(
+      await dbModel.getMany({
+        model: match,
+        select: data.select,
+        orderBy: { [data.sort.field]: data.sort.order },
+        skip: data.pagination.skip,
+        take: data.pagination.take,
+      })
+    );
+  } catch (error) {
+    return handleError(error);
+  }
+};
+
 const createMatch = async (data) => {
   try {
-    await validate(data.match);
-    const response = await matchModel.createMatch(data.match);
-    if (response.success && response.data.stageId) {
-      await updateStageVersion(response.data.stageId);
-    }
-    return handleResponse(response);
-  } catch (error) {
-    return handleError(error);
-  }
-};
-const createManyMatch = async (data) => {
-  try {
-    await validateMany(data.matches);
-    const response = await matchModel.createManyMatch(data.matches);
-    return handleResponse(response);
-  } catch (error) {
-    return handleError(error);
-  }
-};
-const getMatch = async (data) => {
-  try {
-    await validateId(data.id);
-    const response = await matchModel.getMatch(data.id);
-    return handleResponse(response);
-  } catch (error) {
-    return handleError(error);
-  }
-};
-const getAllMatches = async () => {
-  try {
-    const response = await matchModel.getAllMatches();
-    return handleResponse(response);
-  } catch (error) {
-    return handleError(error);
-  }
-};
-const updateMatch = async (data) => {
-  try {
-    await validateId(data.id);
-    await validate(data.match);
-    const response = await matchModel.updateMatch(data.id, data.match);
-    if (response.success && response.data.stageId) {
-      await updateStageVersion(response.data.stageId);
-    }
-    return handleResponse(response);
-  } catch (error) {
-    return handleError(error);
-  }
-};
-const deleteMatch = async (data) => {
-  try {
-    await validateId(data.id);
-    const response = await matchModel.deleteMatch(data.id);
-    if (response.success && response.data.stageId) {
-      await updateStageVersion(response.data.stageId);
-    }
-    return handleResponse(response);
-  } catch (error) {
-    return handleError(error);
-  }
-};
-const deleteManyMatch = async (data) => {
-  try {
-    await validateIds(data.ids);
-    const response = await matchModel.deleteManyMatch(data.ids);
+    await validate({ schema: matchCreateSchema, data: data, field: 'match' });
+    await validate({ schema: matchSelectSchema, data: data, field: 'select' });
+    const response = await dbModel.create({
+      model: match,
+      select: data.select,
+      data: data.match,
+    });
+    // if (response.success && response.data.stageId) {
+    //   await updateStageVersion(response.data.stageId);
+    // }
     return handleResponse(response);
   } catch (error) {
     return handleError(error);
   }
 };
 
-const handleError = (error) => {
-  if (error.isJoi) {
-    return {
-      success: false,
-      error: modelError.NOT_VALID(error.details[0].path, error.details[0].message, error.details[0].type),
-    };
+const getMatch = async (data) => {
+  try {
+    await validate({ schema: matchFindSchema, data: data, field: 'match' });
+    await validate({ schema: matchSelectSchema, data: data, field: 'select' });
+    return handleResponse(
+      await dbModel.get({
+        model: match,
+        where: { [data.match.where]: data.match.value },
+        select: data.select,
+      })
+    );
+  } catch (error) {
+    return handleError(error);
   }
-  return {
-    success: false,
-  };
 };
+
+const updateMatch = async (data) => {
+  try {
+    await validate({ schema: matchFindSchema, data: data, field: 'match' });
+    await validate({ schema: matchSelectSchema, data: data, field: 'select' });
+    await validate({ schema: matchUpdateSchema, data: data, field: 'update' });
+    return handleResponse(
+      await dbModel.update({
+        model: match,
+        where: { [data.match.where]: data.match.value },
+        data: data.update,
+        select: data.select,
+      })
+    );
+  } catch (error) {
+    return handleError(error);
+  }
+};
+
+const deleteMatch = async (data) => {
+  try {
+    await validate({ schema: matchFindSchema, data: data, field: 'match' });
+    await validate({ schema: matchSelectSchema, data: data, field: 'select' });
+    return handleResponse(
+      await dbModel.remove({
+        model: match,
+        where: { [data.match.where]: data.match.value },
+        select: data.select,
+      })
+    );
+  } catch (error) {
+    return handleError(error);
+  }
+};
+
+const deleteManyMatch = async (data) => {
+  try {
+    await validate({ schema: matchFindManySchema, data: data, field: 'matches' });
+    return handleResponse(
+      await dbModel.removeMany({
+        model: match,
+        where: { [data.matches.where]: { in: data.matches.values } },
+      })
+    );
+  } catch (error) {
+    return handleError(error);
+  }
+};
+
+const createManyMatch = async (data) => {
+  try {
+    await validate({ schema: matchCreateManySchema, data: data, field: 'matches' });
+    return handleResponse(
+      await dbModel.createMany({
+        model: match,
+        data: data.matches,
+        select: data.select,
+      })
+    );
+  } catch (error) {
+    return handleError(error);
+  }
+};
+
 const handleResponse = (response) => {
   if (!response.success) {
     return {
@@ -107,41 +152,81 @@ const handleResponse = (response) => {
     data: response.data,
   };
 };
-const validate = async (data, create = true) => {
-  if (create) {
-    await matchCreateSchema.validateAsync(data);
-  } else {
-    await matchUpdateSchema.validateAsync(data);
+
+const handleError = (error) => {
+  if (error.isValidation) {
+    return {
+      success: false,
+      error: modelError.NOT_PROVIDED(error.meta),
+    };
   }
-};
-const validateMany = async (data, create = true) => {
-  if (create) {
-    await matchCreateManySchema.validateAsync(data);
+  if (error.isJoi) {
+    return {
+      success: false,
+      error: modelError.NOT_VALID(error.details[0].path, error.details[0].message, error.details[0].type),
+    };
   }
+  return {
+    success: false,
+  };
 };
-const validateId = async (data) => {
-  await idSchema.validateAsync(data);
+
+const validate = async ({ schema, data, field }) => {
+  if (!data[field]) {
+    throw { isValidation: true, meta: `${field}` };
+  }
+  await schema.validateAsync(data[field]);
 };
-const validateIds = async (data) => {
-  await idArraySchema.validateAsync(data);
-};
-const idSchema = Joi.string().min(2).max(32).required();
-const idArraySchema = Joi.array().items(idSchema).min(2).required();
+
+const paginationSchema = Joi.object({
+  skip: Joi.number().integer().min(0),
+  take: Joi.number().integer().min(5).max(100).required(),
+}).required();
+
+const matchSortSchema = Joi.object({
+  field: Joi.string().allow('homeTeamId', 'stageId', 'id', 'awayTeamId', 'dateTime').required(),
+  order: Joi.string().allow('asc', 'desc').required(),
+}).required();
+
+const matchFindSchema = Joi.object({
+  where: Joi.string().allow('id', 'stageId', 'homeTeamId', 'awayTeamId', 'dateTime').required(),
+  value: Joi.string().min(2).required(),
+}).required();
+
+const matchFindManySchema = Joi.object({
+  where: Joi.string().allow('id').required(),
+  values: Joi.array().items(Joi.string().min(2)).min(1).required(),
+}).required();
+
+const matchSelectSchema = Joi.object({
+  id: Joi.boolean(),
+  homeTeamId: Joi.boolean(),
+  awayTeamId: Joi.boolean(),
+  dateTime: Joi.boolean(),
+  stageId: Joi.boolean(),
+  predictions: Joi.boolean(),
+  stage: Joi.boolean(),
+  homeTeam: Joi.boolean(),
+  awayTeam: Joi.boolean(),
+}).required();
+
 const matchCreateSchema = Joi.object({
   id: Joi.string().min(2).required(),
   dateTime: Joi.date().iso().required(),
   homeTeamId: Joi.string().min(2).required(),
   awayTeamId: Joi.string().min(2).required(),
-});
-const matchCreateManySchema = Joi.array().items(matchCreateSchema).min(2).required();
+  stageId: Joi.string().min(2).required(),
+}).required();
+const matchCreateManySchema = Joi.array().items(matchCreateSchema).min(1).required();
+
 const matchUpdateSchema = Joi.object({
   id: Joi.string().min(2),
   dateTime: Joi.date().iso(),
   homeTeamId: Joi.string().min(2),
   awayTeamId: Joi.string().min(2),
-});
-//maçları oluştur takımlarına bağla ve stagelerine bağla
-//maç skorlarını oluştur maçlarına bağla
+  stageId: Joi.string().min(2),
+}).required();
+
 module.exports = {
   searchMatch,
   createMatch,

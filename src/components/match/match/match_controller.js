@@ -49,7 +49,7 @@ const getMatch = async (req, res) => {
   }
 };
 const getAllMatches = async (req, res) => {
-  const response = await service.getAllMatches();
+  const response = await service.getAllMatches(req.body);
   if (response.success) {
     res.status(StatusCodes.OK).json(response);
   } else {
