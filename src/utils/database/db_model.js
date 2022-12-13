@@ -107,7 +107,7 @@ const createMany = async ({ model, data, select }) => {
 };
 const upsertMany = async ({ model, data }) => {
   try {
-    const response = await db.$transaction(
+    const response = await require('./db_client').$transaction(
       data.map((element) =>
         model.upsert({
           where: element.where,
