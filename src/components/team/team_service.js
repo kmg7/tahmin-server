@@ -14,7 +14,7 @@ const searchTeam = async (data) => {
         model: team,
         where: { [data.team.where]: { startsWith: data.team.value } },
         select: data.select,
-        orderBy: data.sort,
+        orderBy: { [data.sort.field]: data.sort.order },
         skip: data.pagination.skip,
         take: data.pagination.take,
       })
@@ -23,7 +23,7 @@ const searchTeam = async (data) => {
     return handleError(error);
   }
 };
-const getAllTeams = async () => {
+const getAllTeams = async (data) => {
   try {
     await validate({ schema: teamSortSchema, data: data, field: 'sort' });
     await validate({ schema: teamSelectSchema, data: data, field: 'select' });
@@ -32,7 +32,7 @@ const getAllTeams = async () => {
       await dbModel.getMany({
         model: team,
         select: data.select,
-        orderBy: data.sort,
+        orderBy: { [data.sort.field]: data.sort.order },
         skip: data.pagination.skip,
         take: data.pagination.take,
       })
@@ -168,10 +168,10 @@ const validate = async ({ schema, data, field }) => {
 const paginationSchema = Joi.object({
   skip: Joi.number().integer().min(0),
   take: Joi.number().integer().min(5).max(100).required(),
-}).required();
+});
 
 const teamSortSchema = Joi.object({
-  field: Joi.string().allow('id', 'name', 'country').required(),
+  field: Joi.string().allow('id', 'name', 'countryCode', 'code').required(),
   order: Joi.string().allow('asc', 'desc').required(),
 }).required();
 
@@ -188,6 +188,7 @@ const teamFindManySchema = Joi.object({
 const teamSelectSchema = Joi.object({
   id: Joi.boolean(),
   code: Joi.boolean(),
+  country: Joi.boolean(),
   countryCode: Joi.boolean(),
   name: Joi.boolean(),
   logoUrl: Joi.boolean(),
@@ -200,7 +201,7 @@ const teamCreateSchema = Joi.object({
   code: Joi.string().required(),
   name: Joi.string().min(2).max(32).required(),
   logoUrl: Joi.string().required(),
-  country: Joi.string(),
+  countryCode: Joi.string(),
 }).required();
 
 const teamUpdateSchema = Joi.object({
