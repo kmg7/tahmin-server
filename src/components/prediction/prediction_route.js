@@ -11,7 +11,6 @@ const {
   getAllPredictions,
   searchPrediction,
 } = require('./prediction_controller');
-const { upsertManyPrediction } = require('./prediction_model');
 
 router.route('/prediction').get(getPrediction).post(createPrediction).put(updatePrediction).delete(deletePrediction);
 router.route('/prediction/many').get(getAllPredictions).post(createManyPrediction).put(updateManyPrediction).delete(deleteManyPrediction);
