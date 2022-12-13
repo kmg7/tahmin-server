@@ -14,7 +14,7 @@ const searchCountry = async (data) => {
         model: country,
         where: { [data.country.where]: { startsWith: data.country.value } },
         select: data.select,
-        orderBy: data.sort,
+        orderBy: { [data.sort.field]: data.sort.order },
         skip: data.pagination.skip,
         take: data.pagination.take,
       })
@@ -24,7 +24,7 @@ const searchCountry = async (data) => {
   }
 };
 
-const getAllCountries = async () => {
+const getAllCountries = async (data) => {
   try {
     await validate({ schema: countrySortSchema, data: data, field: 'sort' });
     await validate({ schema: countrySelectSchema, data: data, field: 'select' });
@@ -33,7 +33,7 @@ const getAllCountries = async () => {
       await dbModel.getMany({
         model: country,
         select: data.select,
-        orderBy: data.sort,
+        orderBy: { [data.sort.field]: data.sort.order },
         skip: data.pagination.skip,
         take: data.pagination.take,
       })
@@ -163,6 +163,7 @@ const handleError = (error) => {
       error: modelError.NOT_VALID(error.details[0].path, error.details[0].message, error.details[0].type),
     };
   }
+  console.log(error);
   return {
     success: false,
   };

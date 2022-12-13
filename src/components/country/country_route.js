@@ -9,7 +9,7 @@ const {
   getCountry,
   getAllCountries,
   searchCountry,
-} = require('./Country_controller');
+} = require('./country_controller');
 
 router.route('/country').get(getCountry).post(createCountry).put(updateCountry).delete(deleteCountry);
 router.route('/country/many').get(getAllCountries).post(createManyCountry).delete(deleteManyCountry);
