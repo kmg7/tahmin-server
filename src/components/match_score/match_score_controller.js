@@ -49,7 +49,7 @@ const getMatchScore = async (req, res) => {
   }
 };
 const getAllMatchScores = async (req, res) => {
-  const response = await service.getAllMatchScores();
+  const response = await service.getAllMatchScores(req.body);
   if (response.success) {
     res.status(StatusCodes.OK).json(response);
   } else {
