@@ -1,7 +1,7 @@
-const { StatusCodes } = require('http-status-codes');
-const { validateToken } = require('../utils/authentication');
-const logger = require('../utils/logger');
-const authenticateUser = async (req, res, next) => {
+import { StatusCodes } from 'http-status-codes';
+import { validateToken } from '../utils/authentication/index.js';
+import logger from '../utils/logger.js';
+export const authenticateUser = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     res.status(StatusCodes.UNAUTHORIZED).json({
@@ -31,7 +31,7 @@ const authenticateUser = async (req, res, next) => {
 };
 // logger.warn(`Unauhorized attempt\nRoute:${req.path}\nMethod:${req.method}\nUser:${req.user.authId}`);
 
-const authorizePermissions = (...level) => {
+export const authorizePermissions = (...level) => {
   return (req, res, next) => {
     if (req.user.isSU) {
       logger.info(`Admin attempt\nRoute:${req.path}\nMethod:${req.method}\nUser:${req.user.username}`);
@@ -66,6 +66,7 @@ const permissions = {
     PATCH: false,
   },
 };
+
 // const authorizePermissions = (...roles) => {
 //   return (req, res, next) => {
 //     if (!roles.includes(req.user.role)) {
@@ -79,4 +80,3 @@ const permissions = {
 //     }
 //   };
 // };
-module.exports = { authenticateUser, authorizePermissions };

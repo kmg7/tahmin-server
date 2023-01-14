@@ -1,4 +1,4 @@
-const { isFloat, isInt, isISO8601 } = require('validator');
+import { isFloat, isInt, isISO8601 } from 'validator';
 
 const integer = (input) => {
   if (!input) {
@@ -20,7 +20,8 @@ const isString = (input) => {
 const array = (input) => {
   return typeof input === 'object' && Object.prototype.toString.call(input) === '[object Array]';
 };
-module.exports = {
+
+export default {
   array,
   float,
   isString,

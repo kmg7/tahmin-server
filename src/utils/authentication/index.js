@@ -1,7 +1,8 @@
-const admin = require('firebase-admin');
-const logger = require('../logger');
-const checkPermissions = require('./check_permissions');
-const initializeAuthService = () => {
+import admin from 'firebase-admin';
+import logger from '../logger.js';
+import checkPermissions from './check_permissions.js';
+
+export const initializeAuthService = () => {
   try {
     admin.initializeApp({
       credential: admin.credential.cert({
@@ -19,7 +20,7 @@ const initializeAuthService = () => {
     logger.error(error);
   }
 };
-const validateToken = async ({ token }) => {
+export const validateToken = async ({ token }) => {
   try {
     const response = await admin.auth().verifyIdToken(token);
     const isSU = process.env.SUPERUSERS.includes(response.uid);
@@ -71,4 +72,4 @@ const handleError = (error) => {
   };
 };
 
-module.exports = { initializeAuthService, validateToken, checkPermissions };
+export default { initializeAuthService, validateToken, checkPermissions };

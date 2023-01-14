@@ -1,4 +1,4 @@
-const fs = require('fs');
+import fs from 'fs';
 let errors;
 const path = 'errors.json';
 fs.readFile(path, (err, data) => {
@@ -44,7 +44,8 @@ const EXISTS = (fields) => {
     message: errors.T1004,
   };
 };
-module.exports = {
+
+export default {
   CUSTOM,
   NOT_VALID,
   NOT_PROVIDED,
