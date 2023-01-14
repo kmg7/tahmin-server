@@ -5,4 +5,4 @@ const checkPermissions = ({ requestUser, resourceUserId }) => {
   }
   return false;
 };
-module.exports = checkPermissions;
+export default checkPermissions;

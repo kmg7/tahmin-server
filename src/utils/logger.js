@@ -1,5 +1,6 @@
-const { createLogger, transports, format } = require('winston');
-
+import { createLogger, transports, format } from 'winston';
+import path from 'path';
+const filename = path.join('logs', `${new Date().toDateString()}.log`);
 const customFormat = format.combine(
   format.timestamp(),
   format.printf((info) => {
@@ -9,10 +10,7 @@ const customFormat = format.combine(
 
 let logger = createLogger({
   format: customFormat,
-  transports: [
-    new transports.Console({ level: 'silly' }),
-    new transports.File({ filename: require('path').join('logs', `${new Date().toDateString()}.log`), level: 'info' }),
-  ],
+  transports: [new transports.Console({ level: 'silly' }), new transports.File({ filename: filename, level: 'info' })],
 });
 
-module.exports = logger;
+export default logger;
