@@ -72,4 +72,4 @@ const handleError = (error) => {
   };
 };
 
-export default { initializeAuthService, validateToken, checkPermissions };
+export { checkPermissions };
