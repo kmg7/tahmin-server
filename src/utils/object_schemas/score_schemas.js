@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { filterConditionsStandart, sortOrder, stringMinTwo, stringMinTwoRequired } from './common_schemas';
+import { filterConditionsStandart, sortOrder, stringMinTwo, stringMinTwoRequired, bool } from './common_schemas.js';
 
 export const Create = Joi.object({
   id: Joi.string(),

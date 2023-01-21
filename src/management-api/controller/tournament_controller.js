@@ -74,7 +74,7 @@ const stageFields = {
 const standingsFields = {
   id: true,
   tournamentId: true,
-  tournament: true,
+  tournament: false,
   scores: true,
 };
 

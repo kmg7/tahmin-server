@@ -65,7 +65,7 @@ export const Update = Joi.object({
   id: stringMinTwo,
   name: stringMinTwo,
   active: bool,
-  MatchId: stringMinTwo,
+  tournamentId: stringMinTwo,
 }).required();
 
 export const Upsert = Joi.array()
