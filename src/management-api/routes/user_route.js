@@ -5,6 +5,7 @@ import {
   createUser,
   createManyUser,
   updateUser,
+  upsertUser,
   deleteUser,
   deleteManyUser,
   getUser,

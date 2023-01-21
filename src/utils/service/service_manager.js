@@ -55,7 +55,7 @@ export class ServiceManager {
     try {
       await validate([
         {
-          obj: { id: id, prop: property, sort: sort, select: select },
+          obj: { id: id, prop: property, sort: sort, select: select[property] },
           sch: this.validationSchemas.Property,
         },
         { obj: pagination, sch: paginationSchema },
@@ -66,7 +66,7 @@ export class ServiceManager {
         },
         select: {
           [property]: {
-            select: select,
+            select: select[property],
             orderBy: { [sort.sortBy]: sort.order },
             skip: ~~pagination.skip,
             take: ~~pagination.take,
@@ -76,7 +76,7 @@ export class ServiceManager {
       if (search) {
         await validate({
           obj: { prop: property, search: search },
-          sch: this.validationSchemas.SearchProperty,
+          sch: this.validationSchemas.PropertySearch,
         });
         params.select[property].where = { [search.field]: { [search.condition]: search.value } };
       }
@@ -124,7 +124,7 @@ export class ServiceManager {
         { obj: data, sch: this.validationSchemas.Update },
       ]);
       const response = await this.ormManager.update({
-        where: where,
+        where: { [where.field]: where.value },
         data: data,
         select: select,
       });
