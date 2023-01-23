@@ -1,6 +1,5 @@
 import { validate } from '../validator.js';
 import { handleError, convertToArray } from './service_utils.js';
-import err_lib from '../../management-api/errors/error_library.js';
 import { pagination as paginationSchema } from '../object_schemas/common_schemas.js';
 
 export class ServiceManager {
@@ -21,7 +20,7 @@ export class ServiceManager {
       });
       return response;
     } catch (error) {
-      return handleError({ error: error, errorLib: err_lib });
+      return handleError(error);
     }
   }
 
@@ -34,7 +33,7 @@ export class ServiceManager {
       });
       return response;
     } catch (error) {
-      return handleError({ error: error, errorLib: err_lib });
+      return handleError(error);
     }
   }
 
@@ -47,7 +46,7 @@ export class ServiceManager {
       });
       return response;
     } catch (error) {
-      return handleError({ error: error, errorLib: err_lib });
+      return handleError(error);
     }
   }
 
@@ -83,7 +82,7 @@ export class ServiceManager {
       const response = await this.ormManager.get(params);
       return response;
     } catch (error) {
-      return handleError({ error: error, errorLib: err_lib });
+      return handleError(error);
     }
   }
 
@@ -113,7 +112,7 @@ export class ServiceManager {
       });
       return response;
     } catch (error) {
-      return handleError({ error: error, errorLib: err_lib });
+      return handleError(error);
     }
   }
 
@@ -130,7 +129,7 @@ export class ServiceManager {
       });
       return response;
     } catch (error) {
-      return handleError({ error: error, errorLib: err_lib });
+      return handleError(error);
     }
   }
 
@@ -140,7 +139,7 @@ export class ServiceManager {
       const response = await this.ormManager.upsertMany({ data: data, select: select });
       return response;
     } catch (error) {
-      return handleError({ error: error, errorLib: err_lib });
+      return handleError(error);
     }
   }
 
@@ -153,7 +152,7 @@ export class ServiceManager {
       });
       return response;
     } catch (error) {
-      return handleError({ error: error, errorLib: err_lib });
+      return handleError(error);
     }
   }
 
@@ -175,7 +174,7 @@ export class ServiceManager {
       });
       return response;
     } catch (error) {
-      return handleError({ error: error, errorLib: err_lib });
+      return handleError(error);
     }
   }
 }
