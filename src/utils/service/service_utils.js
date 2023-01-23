@@ -7,26 +7,21 @@ export const convertToArray = (input) => {
   }
 };
 
-export const handleError = ({ error, errorLib }) => {
-  //TODO noProduction
-  console.log(error);
-  if (error.isNotProvided) {
+export const handleError = (err) => {
+  if (err.isJoi) {
     return {
-      success: false,
-      statusCode: 400,
-      error: errorLib.NOT_PROVIDED(error.meta),
+      layer: 'SERVICE',
+      level: 'EXPECTED',
+      code: err.details[0].type ?? 'unknown',
+      meta: err.details[0].path ?? 'unknown',
+      details: err,
+    };
+  } else {
+    return {
+      layer: 'SERVICE',
+      level: 'CRITICAL',
+      code: 'internal',
+      details: err,
     };
   }
-  if (error.isJoi) {
-    return {
-      success: false,
-      statusCode: 400,
-      error: errorLib.NOT_VALID(error.details[0].path, error.details[0].message, error.details[0].type),
-    };
-  }
-  return {
-    success: false,
-    statusCode: 500,
-    error: { message: 'Internal server error' },
-  };
 };
