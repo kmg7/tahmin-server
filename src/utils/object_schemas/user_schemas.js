@@ -24,7 +24,7 @@ export const Create = Joi.object({
 export const CreateMany = Joi.array().items(Create).min(2).required();
 
 export const Find = Joi.object({
-  field: Joi.string().allow('username', 'email', 'authId', 'id').required(),
+  field: Joi.string().allow('username', 'email', 'authId', 'id').only().required(),
   value: stringMinTwoRequired,
 }).required();
 
@@ -77,7 +77,7 @@ export const Upsert = Joi.array()
   .required();
 
 export const Sort = Joi.object({
-  sortBy: Joi.string().allow('username', 'email', 'createdAt', 'updatedAt', 'role').required(),
+  sortBy: Joi.string().allow('username', 'email', 'createdAt', 'updatedAt', 'role').only().required(),
   order: sortOrder,
 }).required();
 

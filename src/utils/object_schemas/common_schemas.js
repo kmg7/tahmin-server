@@ -15,7 +15,7 @@ export const bool = Joi.boolean();
 
 export const boolRequired = bool.required();
 
-export const sortOrder = Joi.string().allow('asc', 'desc').required();
+export const sortOrder = Joi.string().allow('asc', 'desc').only().required();
 
 export const date = Joi.string().isoDate();
 

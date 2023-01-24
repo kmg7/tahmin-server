@@ -31,7 +31,6 @@ export const Search = Joi.object({
   condition: filterConditionsStandart,
   value: stringMinTwoRequired,
 }).required();
-// condition: Joi.string().allow('equals', 'not', 'in', 'lt', 'lte', 'gt', 'gte', 'contains', 'startswith', 'endswith').only(),
 
 export const Update = Joi.object({
   id: stringMinTwo,
