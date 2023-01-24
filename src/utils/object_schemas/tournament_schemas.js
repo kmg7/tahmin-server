@@ -27,7 +27,7 @@ export const Create = Joi.object({
 export const CreateMany = Joi.array().items(Create).min(2).required();
 
 export const Find = Joi.object({
-  field: Joi.string().allow('id').required(),
+  field: Joi.string().allow('id').only().required(),
   value: stringMinTwoRequired,
 }).required();
 

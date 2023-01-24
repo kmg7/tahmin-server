@@ -22,7 +22,7 @@ export const Create = Joi.object({
 export const CreateMany = Joi.array().items(Create).min(2).required();
 
 export const Find = Joi.object({
-  field: Joi.string().allow('id', 'matchId_userId').required(),
+  field: Joi.string().allow('id', 'matchId_userId').only().required(),
   value: Joi.when('field', {
     is: 'matchId_userId',
     then: Joi.object({
