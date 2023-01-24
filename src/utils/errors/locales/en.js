@@ -22,3 +22,10 @@ export const DATABASE = {
 };
 
 export const INTERNAL = 'Unexpected internal server error';
+
+export const AUTH = {
+  'auth/id-token-expired': 'Token expired',
+  'auth/argument-error': 'Invalid JWT',
+  'auth/invalid-id-token': 'Invalid token',
+  'auth/revoked-id-token': 'Token revoked',
+};
