@@ -1,6 +1,6 @@
 import validator from 'validator';
-const { isFloat, isInt } = validator;
-const integer = (input) => {
+const { isFloat, isInt, isJSON } = validator;
+export const integer = (input) => {
   if (!input) {
     return false;
   } else {
@@ -8,7 +8,7 @@ const integer = (input) => {
   }
 };
 
-const float = (input) => {
+export const float = (input) => {
   if (!input) {
     return false;
   } else {
@@ -16,13 +16,15 @@ const float = (input) => {
   }
 };
 
-const isString = (input) => {
+export const isString = (input) => {
   return typeof input === 'string' && Object.prototype.toString.call(input) === '[object String]';
 };
 
-const array = (input) => {
+export const array = (input) => {
   return typeof input === 'object' && Object.prototype.toString.call(input) === '[object Array]';
 };
+
+export const isJson = (input) => isJSON(input);
 
 export const validate = async (input) => {
   if (Array.isArray(input)) {
@@ -33,5 +35,3 @@ export const validate = async (input) => {
     await input.sch.validateAsync(input.obj);
   }
 };
-
-export { array, float, isString, integer };
