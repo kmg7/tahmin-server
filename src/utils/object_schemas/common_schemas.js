@@ -25,6 +25,16 @@ export const url = Joi.string().uri();
 
 export const urlRequired = url.required();
 
+export const email = Joi.string().email();
+
+export const emailRequired = Joi.string().email();
+
+export const password = Joi.string().pattern(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/);
+
+export const passwordRequired = Joi.string()
+  .pattern(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/)
+  .required();
+
 export const pagination = Joi.object({
   skip: Joi.number().integer().min(0),
   take: Joi.number().integer().min(5).max(100).required(),
