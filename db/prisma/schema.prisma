@@ -10,15 +10,43 @@ datasource db {
 
 model User {
   id          String       @id @default(uuid())
-  authId      String       @unique
   username    String       @unique
   email       String       @unique
-  role        String       @default("NOT_VERIFIED")
+  verified    Boolean      @default(false)
+  role        String       @default("NOT_SPECIFIED")
   password    String       @default("NOT_STORED")
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   scores      Score[]
   predictions Prediction[]
+}
+
+model Moderator {
+  id             String      @id @default(uuid())
+  username       String      @unique
+  email          String      @unique
+  role           String      @default("NOT_ASSIGNED")
+  password       String      @default("NOT_STORED")
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  authorizations Authority[]
+}
+
+model Authority {
+  id            String    @id @default(uuid())
+  featureId     String
+  moderatorName String
+  role          String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  feature       Feature   @relation(fields: [featureId], references: [id])
+  moderator     Moderator @relation(fields: [moderatorName], references: [username])
+}
+
+model Feature {
+  id             String      @id
+  name           String
+  authorizations Authority[]
 }
 
 model Team {
@@ -30,8 +58,6 @@ model Team {
   country     Country @relation(fields: [countryCode], references: [code])
   homeMatches Match[] @relation("homeMatches")
   awayMatches Match[] @relation("awayMatches")
-
-  @@unique([countryCode, code])
 }
 
 model Country {
@@ -44,8 +70,8 @@ model Country {
 }
 
 model Tournament {
-  countryCode String
   id          String      @id @unique
+  countryCode String
   active      Boolean     @default(false)
   name        String
   code        String
@@ -99,7 +125,7 @@ model Prediction {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   match     Match    @relation(fields: [matchId], references: [id])
-  user      User     @relation(fields: [userId], references: [authId])
+  user      User     @relation(fields: [userId], references: [id])
 
   @@unique([matchId, userId])
 }

@@ -5,17 +5,48 @@ BEGIN TRAN;
 -- CreateTable
 CREATE TABLE [dbo].[User] (
     [id] NVARCHAR(1000) NOT NULL,
-    [authId] NVARCHAR(1000) NOT NULL,
     [username] NVARCHAR(1000) NOT NULL,
     [email] NVARCHAR(1000) NOT NULL,
-    [role] NVARCHAR(1000) NOT NULL CONSTRAINT [User_role_df] DEFAULT 'NOT_VERIFIED',
+    [verified] BIT NOT NULL CONSTRAINT [User_verified_df] DEFAULT 0,
+    [role] NVARCHAR(1000) NOT NULL CONSTRAINT [User_role_df] DEFAULT 'NOT_SPECIFIED',
     [password] NVARCHAR(1000) NOT NULL CONSTRAINT [User_password_df] DEFAULT 'NOT_STORED',
     [createdAt] DATETIME2 NOT NULL CONSTRAINT [User_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
     [updatedAt] DATETIME2 NOT NULL,
     CONSTRAINT [User_pkey] PRIMARY KEY CLUSTERED ([id]),
-    CONSTRAINT [User_authId_key] UNIQUE NONCLUSTERED ([authId]),
     CONSTRAINT [User_username_key] UNIQUE NONCLUSTERED ([username]),
     CONSTRAINT [User_email_key] UNIQUE NONCLUSTERED ([email])
+);
+
+-- CreateTable
+CREATE TABLE [dbo].[Moderator] (
+    [id] NVARCHAR(1000) NOT NULL,
+    [username] NVARCHAR(1000) NOT NULL,
+    [email] NVARCHAR(1000) NOT NULL,
+    [role] NVARCHAR(1000) NOT NULL CONSTRAINT [Moderator_role_df] DEFAULT 'NOT_ASSIGNED',
+    [password] NVARCHAR(1000) NOT NULL CONSTRAINT [Moderator_password_df] DEFAULT 'NOT_STORED',
+    [createdAt] DATETIME2 NOT NULL CONSTRAINT [Moderator_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
+    [updatedAt] DATETIME2 NOT NULL,
+    CONSTRAINT [Moderator_pkey] PRIMARY KEY CLUSTERED ([id]),
+    CONSTRAINT [Moderator_username_key] UNIQUE NONCLUSTERED ([username]),
+    CONSTRAINT [Moderator_email_key] UNIQUE NONCLUSTERED ([email])
+);
+
+-- CreateTable
+CREATE TABLE [dbo].[Authority] (
+    [id] NVARCHAR(1000) NOT NULL,
+    [featureId] NVARCHAR(1000) NOT NULL,
+    [moderatorName] NVARCHAR(1000) NOT NULL,
+    [role] NVARCHAR(1000) NOT NULL,
+    [createdAt] DATETIME2 NOT NULL CONSTRAINT [Authority_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
+    [updatedAt] DATETIME2 NOT NULL,
+    CONSTRAINT [Authority_pkey] PRIMARY KEY CLUSTERED ([id])
+);
+
+-- CreateTable
+CREATE TABLE [dbo].[Feature] (
+    [id] NVARCHAR(1000) NOT NULL,
+    [name] NVARCHAR(1000) NOT NULL,
+    CONSTRAINT [Feature_pkey] PRIMARY KEY CLUSTERED ([id])
 );
 
 -- CreateTable
@@ -26,8 +57,7 @@ CREATE TABLE [dbo].[Team] (
     [logoUrl] NVARCHAR(1000) NOT NULL,
     [countryCode] NVARCHAR(1000) NOT NULL,
     CONSTRAINT [Team_pkey] PRIMARY KEY CLUSTERED ([id]),
-    CONSTRAINT [Team_id_key] UNIQUE NONCLUSTERED ([id]),
-    CONSTRAINT [Team_countryCode_code_key] UNIQUE NONCLUSTERED ([countryCode],[code])
+    CONSTRAINT [Team_id_key] UNIQUE NONCLUSTERED ([id])
 );
 
 -- CreateTable
@@ -42,8 +72,8 @@ CREATE TABLE [dbo].[Country] (
 
 -- CreateTable
 CREATE TABLE [dbo].[Tournament] (
-    [countryCode] NVARCHAR(1000) NOT NULL,
     [id] NVARCHAR(1000) NOT NULL,
+    [countryCode] NVARCHAR(1000) NOT NULL,
     [active] BIT NOT NULL CONSTRAINT [Tournament_active_df] DEFAULT 0,
     [name] NVARCHAR(1000) NOT NULL,
     [code] NVARCHAR(1000) NOT NULL,
@@ -119,6 +149,12 @@ CREATE TABLE [dbo].[Score] (
 );
 
 -- AddForeignKey
+ALTER TABLE [dbo].[Authority] ADD CONSTRAINT [Authority_featureId_fkey] FOREIGN KEY ([featureId]) REFERENCES [dbo].[Feature]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE [dbo].[Authority] ADD CONSTRAINT [Authority_moderatorName_fkey] FOREIGN KEY ([moderatorName]) REFERENCES [dbo].[Moderator]([username]) ON DELETE NO ACTION ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE [dbo].[Team] ADD CONSTRAINT [Team_countryCode_fkey] FOREIGN KEY ([countryCode]) REFERENCES [dbo].[Country]([code]) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -143,7 +179,7 @@ ALTER TABLE [dbo].[MatchScore] ADD CONSTRAINT [MatchScore_stageId_fkey] FOREIGN 
 ALTER TABLE [dbo].[Prediction] ADD CONSTRAINT [Prediction_matchId_fkey] FOREIGN KEY ([matchId]) REFERENCES [dbo].[Match]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE [dbo].[Prediction] ADD CONSTRAINT [Prediction_userId_fkey] FOREIGN KEY ([userId]) REFERENCES [dbo].[User]([authId]) ON DELETE NO ACTION ON UPDATE CASCADE;
+ALTER TABLE [dbo].[Prediction] ADD CONSTRAINT [Prediction_userId_fkey] FOREIGN KEY ([userId]) REFERENCES [dbo].[User]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE [dbo].[Standings] ADD CONSTRAINT [Standings_tournamentId_fkey] FOREIGN KEY ([tournamentId]) REFERENCES [dbo].[Tournament]([id]) ON DELETE NO ACTION ON UPDATE CASCADE;
