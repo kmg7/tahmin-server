@@ -67,7 +67,7 @@ export const Update = Joi.object({
   id: stringMinTwo,
   code: stringMinTwo,
   countryCode: stringMinTwo,
-  name: stringMinTwoRequired,
+  name: stringMinTwo,
   logoUrl: url,
 }).required();
 

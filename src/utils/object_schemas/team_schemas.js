@@ -21,7 +21,7 @@ export const Create = Joi.object({
 export const CreateMany = Joi.array().items(Create).min(2).required();
 
 export const Find = Joi.object({
-  field: Joi.string().allow('id', 'countryCode_code').only().$_compilerequired(),
+  field: Joi.string().allow('id', 'countryCode_code').only().required(),
   value: Joi.when('field', {
     is: 'countryCode_code',
     then: Joi.object({
