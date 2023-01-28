@@ -1,9 +1,12 @@
-const checkPermissions = ({ requestUser, resourceUserId }) => {
-  if (process.env.NODE_ENV == 'development') return true;
-  if (process.env.SUPERUSERS.includes(requestUser.authId)) return true;
-  if (resourceUserId) {
-    if (requestUser.authId === resourceUserId) return true;
-  }
-  return false;
+import { NODE_ENV } from '../../config.js';
+import { FeaturePermissions, PermissionLevels } from './permissions.js';
+
+export default async ({ feature, role, method }) => {
+  if (NODE_ENV == 'development-no-auth') return true;
+  return getRoleRight(method, FeaturePermissions[feature][role]);
 };
-export default checkPermissions;
+
+const getRoleRight = (method, rights) => {
+  if (!rights) return false;
+  return PermissionLevels[rights][method];
+};
