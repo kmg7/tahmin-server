@@ -50,22 +50,18 @@ const deleteManyModerator = async (req, res) => {
 
 const fields = {
   id: true,
-  authId: true,
   username: true,
   email: true,
   role: true,
   password: true,
   createdAt: true,
   updatedAt: true,
-  scores: false,
-  predictions: false,
 };
 
 const scoreFields = {
   id: true,
   username: true,
   standingsId: true,
-  Moderator: false,
 };
 
 const predictionFields = {
@@ -77,8 +73,6 @@ const predictionFields = {
   processed: true,
   createdAt: true,
   updatedAt: true,
-  match: false,
-  Moderator: false,
 };
 
 export {

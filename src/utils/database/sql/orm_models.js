@@ -9,4 +9,7 @@ export const Models = Object.freeze({
   TOURNAMENT: 'tournament',
   PREDICTION: 'prediction',
   MATCH_SCORE: 'matchScore',
+  MODERATOR: 'moderator',
+  FEATURE: 'feature',
+  AUTHORITY: 'authority',
 });
