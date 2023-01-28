@@ -4,16 +4,19 @@ import { authenticateUser, authorizePermissions } from './middleware/authenticat
 
 const router = Router();
 
-// router.use('/auth', routes.auth);
-router.use('/match', authenticateUser, authorizePermissions('C'), routes.match);
-router.use('/stage', authenticateUser, authorizePermissions('C'), routes.stage);
-router.use('/team', authenticateUser, authorizePermissions('C'), routes.team);
-router.use('/country', authenticateUser, authorizePermissions('C'), routes.country);
-router.use('/tournament', authenticateUser, authorizePermissions('C'), routes.tournament);
-router.use('/match_score', authenticateUser, authorizePermissions('C'), routes.match_score);
-router.use('/user', authenticateUser, authorizePermissions('B'), routes.user);
-router.use('/prediction', authenticateUser, authorizePermissions('A'), routes.prediction);
-router.use('/standings', authenticateUser, authorizePermissions('C'), routes.standings);
-router.use('/score', authenticateUser, authorizePermissions('C'), routes.score);
+router.use('/auth', routes.auth);
+router.use('/match', authenticateUser, authorizePermissions('match'), routes.match);
+router.use('/stage', authenticateUser, authorizePermissions('stage'), routes.stage);
+router.use('/team', authenticateUser, authorizePermissions('team'), routes.team);
+router.use('/country', authenticateUser, authorizePermissions('country'), routes.country);
+router.use('/tournament', authenticateUser, authorizePermissions('tournament'), routes.tournament);
+router.use('/matchScore', authenticateUser, authorizePermissions('match_score'), routes.match_score);
+router.use('/user', authenticateUser, authorizePermissions('user'), routes.user);
+router.use('/prediction', authenticateUser, authorizePermissions('prediction'), routes.prediction);
+router.use('/standings', authenticateUser, authorizePermissions('standings'), routes.standings);
+router.use('/score', authenticateUser, authorizePermissions('score'), routes.score);
+router.use('/authority', authenticateUser, authorizePermissions('authority'), routes.authority);
+router.use('/moderator', authenticateUser, authorizePermissions('moderator'), routes.moderator);
+router.use('/feature', authenticateUser, authorizePermissions('feature'), routes.feature);
 
 export default router;

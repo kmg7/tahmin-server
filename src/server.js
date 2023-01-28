@@ -5,27 +5,28 @@ import helmet from 'helmet';
 
 import logger from './utils/logger.js';
 import management_app from './management-api/app.js';
-dotenv.config();
+import './utils/authentication/firebase_utils.js';
+import { NODE_ENV, PORT, HOST } from './config.js';
 
+dotenv.config();
 const server = express();
 
+server.set('env', NODE_ENV);
 server.use(xss());
 server.use(helmet());
 server.disable('x-powered-by');
-server.use(express.json());
 server.use('/management', management_app);
 
 server.get('/', (req, res) => {
-  res.send('Tahmin API v1 BETA');
+  res.status(200).json('Tahmin API v1 BETA');
 });
 
 const start = async () => {
   try {
-    server.listen(process.env.PORT, () =>
-      logger.info(`🚀 Server is listening on ${process.env.HOST} port ${process.env.PORT} mode:${process.env.NODE_ENV}`)
-    );
+    server.listen(PORT, () => logger.info(`🚀 Server is listening on ${HOST} port ${PORT} mode:${NODE_ENV}`));
   } catch (error) {
     logger.error(error);
   }
 };
+
 start();
