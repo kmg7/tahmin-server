@@ -8,10 +8,14 @@ import match from './match_route.js';
 import match_score from './match_score_route.js';
 import prediction from './prediction_route.js';
 import score from './score_route.js';
-// import auth from './auth_route.js';
+import authority from './authority_route.js';
+import moderator from './moderator_route.js';
+import feature from './feature_route.js';
+import auth from './auth_route.js';
 // // import status from './status_route.js';
 
 export default {
+  auth,
   country,
   team,
   tournament,
@@ -22,4 +26,7 @@ export default {
   prediction,
   score,
   user,
+  authority,
+  feature,
+  moderator,
 };
