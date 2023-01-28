@@ -12,6 +12,7 @@ import {
 export const Create = Joi.object({
   id: stringMinTwo,
   featureId: stringMinTwoRequired,
+  moderatorId: stringMinTwoRequired,
   role: stringMinTwoRequired,
 }).required();
 
@@ -28,7 +29,7 @@ export const FindMany = Joi.object({
 }).required();
 
 export const Search = Joi.object({
-  field: Joi.string().allow('id', 'featureId', 'moderatorName', 'role', 'createdAt', 'updatedAt').only().required(),
+  field: Joi.string().allow('id', 'featureId', 'moderatorId', 'role', 'createdAt', 'updatedAt').only().required(),
   condition: filterConditionsStandart,
   value: stringMinTwoRequired,
 }).required();
@@ -43,14 +44,14 @@ export const Upsert = Joi.array()
   .required();
 
 export const Sort = Joi.object({
-  sortBy: Joi.string().allow('id', 'featureId', 'moderatorName', 'role', 'createdAt', 'updatedAt').only().required(),
+  sortBy: Joi.string().allow('id', 'featureId', 'moderatorId', 'role', 'createdAt', 'updatedAt').only().required(),
   order: sortOrder,
 }).required();
 
 export const Select = Joi.object({
   id: bool,
   featureId: bool,
-  moderatorName: bool,
+  moderatorId: bool,
   role: bool,
   createdAt: bool,
   updatedAt: bool,
