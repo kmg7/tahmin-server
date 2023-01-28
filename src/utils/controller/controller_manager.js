@@ -10,7 +10,7 @@ export class ControllerManager {
   async create(req, res, fields) {
     try {
       const response = await this.service.create({ data: req.body, select: fields });
-      handleResponse({ serviceRes: response, res: res, isCreate: true });
+      handleResponse({ serviceRes: response, res: res, statusCode: 201 });
     } catch (error) {
       handleInternalError({ req: req, res: res, err: error });
     }
@@ -19,7 +19,7 @@ export class ControllerManager {
   async createMany(req, res, fields) {
     try {
       const response = await this.service.createMany({ data: req.body, select: fields });
-      handleResponse({ serviceRes: response, res: res, isCreate: true });
+      handleResponse({ serviceRes: response, res: res, statusCode: 201 });
     } catch (error) {
       handleInternalError({ req: req, res: res, err: error });
     }
