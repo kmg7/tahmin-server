@@ -28,4 +28,10 @@ export const AUTH = {
   'auth/argument-error': 'Invalid JWT',
   'auth/invalid-id-token': 'Invalid token',
   'auth/revoked-id-token': 'Token revoked',
+  'auth/email-already-exists': 'Email already in use',
+  'auth/user-not-found': 'User not found',
+};
+
+export const SERVER = {
+  unauthorized: 'Unauthorized to access this route',
 };
