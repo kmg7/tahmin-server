@@ -53,7 +53,7 @@ const deleteManyAuthority = async (req, res) => {
 const fields = {
   id: true,
   featureId: true,
-  moderatorName: true,
+  moderatorId: true,
   role: true,
   createdAt: true,
   updatedAt: true,
