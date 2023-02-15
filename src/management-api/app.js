@@ -18,10 +18,11 @@ app.use(validateContentType);
 
 //route
 app.use(main, routes);
-app.use(notFoundMiddleware);
 
 app.get(main, (req, res) => {
   res.send('Tahmin Management API v1');
 });
+
+app.use(notFoundMiddleware);
 
 export default app;
