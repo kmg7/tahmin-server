@@ -20,7 +20,7 @@ export const Create = Joi.object({
   username: stringMinTwoRequired,
   photoUrl: url,
   email: emailRequired,
-  role: stringMinTwoRequired,
+  role: stringMinTwo,
   password: stringMinTwo,
 }).required();
 
