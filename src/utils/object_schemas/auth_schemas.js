@@ -18,3 +18,8 @@ export const update = Joi.object({
   username: stringMinTwo,
   password: password,
 }).required();
+
+export const check = Joi.object({
+  email: emailRequired,
+  username: Joi.string().min(6).required(0),
+});

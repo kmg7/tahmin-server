@@ -45,4 +45,18 @@ export class AuthManager {
       return handleError(error);
     }
   }
+
+  async isRegistered(email) {
+    try {
+      await this.#admin.getUserByEmail(email);
+      return { notExists: false, field: 'email' };
+    } catch (error) {
+      if (error.code === 'auth/user-not-found') {
+        return {
+          notExists: true,
+        };
+      }
+      return handleError(error);
+    }
+  }
 }
