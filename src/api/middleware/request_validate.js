@@ -1,7 +1,7 @@
 export const validateContentType = (req, res, next) => {
   if (!(req.method == 'GET' || req.method == 'DELETE')) {
     if (!isApplicationJson(req)) {
-      res.status(400).json({
+      res.status(415).json({
         message: 'Content-Type must be application/json',
       });
       return;
