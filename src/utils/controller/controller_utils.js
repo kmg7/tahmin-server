@@ -1,8 +1,8 @@
 import { StatusCodes } from 'http-status-codes';
-import { getMessage, ErrorLevels, ErrorLayers } from '../../utils/errors/index.js';
+import { getCode, ErrorLevels, ErrorLayers } from '../../utils/errors/index.js';
 import logger from '../../utils/logger.js';
 
-export function handleResponse({ serviceRes, res, statusCode, errStatusCode, locale }) {
+export function handleResponse({ serviceRes, res, statusCode, errStatusCode }) {
   if (serviceRes.success || serviceRes.valid) {
     if (!serviceRes.data) {
       res.status(StatusCodes.NOT_FOUND).json({ message: 'Resouce not found or unreachable' });
@@ -10,17 +10,17 @@ export function handleResponse({ serviceRes, res, statusCode, errStatusCode, loc
     }
     res.status(statusCode ?? StatusCodes.OK).json(serviceRes.data);
   } else {
-    const err = handleError({ err: serviceRes, statusCode: errStatusCode, locale: locale });
+    const err = handleError({ err: serviceRes, statusCode: errStatusCode });
     res.status(err.statusCode).json(err.details);
   }
 }
 
-export const handleError = ({ err, locale, statusCode }) => {
+export const handleError = ({ err, statusCode }) => {
   const { layer: layer, level: level, code: code, meta: meta } = err;
   if (level == ErrorLevels.expected) {
     return {
       details: {
-        message: getMessage({ layer: layer, code: code, locale: locale }),
+        code: getCode({ layer: layer, code: code }),
         meta: meta,
       },
       statusCode: statusCode ?? 400,
@@ -28,23 +28,22 @@ export const handleError = ({ err, locale, statusCode }) => {
   } else {
     logger.error(JSON.stringify(err));
     return {
-      details: { message: getMessage({ layer: ErrorLayers.internal, locale: locale }) },
+      details: { code: getCode({ layer: ErrorLayers.internal }) },
       statusCode: 500,
     };
   }
 };
 
-export const handleInternalError = ({ res, err, locale }) => {
+export const handleInternalError = ({ res, err }) => {
   const handledErr = handleError({
     err: {
       layer: ErrorLayers.internal,
       level: ErrorLevels.critical,
       details: {
-        message: err.message,
+        code: err.code,
         stack: err.stack,
       },
     },
-    locale: locale,
   });
 
   res.status(handledErr.statusCode).json(handledErr.details);
