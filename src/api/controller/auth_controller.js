@@ -50,7 +50,6 @@ export const register = async (req, res) => {
 export const update = async (req, res) => {
   try {
     const { id: id } = req.user;
-    console.log(req.user);
     try {
       await schemas.update.validateAsync(req.body);
     } catch (error) {
@@ -62,7 +61,6 @@ export const update = async (req, res) => {
       data: req.body,
       select: { email: true, username: true },
     });
-    console.log(dbResponse);
     if (!dbResponse.success) {
       handleResponse({ res: res, serviceRes: dbResponse });
       return;
@@ -102,19 +100,26 @@ export const check = async (req, res) => {
         return;
       }
       const isRegisteredUsernameDb = await userService.get({
-        where: { field: 'username', value: req.body.email },
+        where: { field: 'username', value: req.body.username },
         select: { username: true },
       });
-      if (!(isRegisteredUsernameDb.success && !isRegisteredUsernameDb.data)) {
-        res.status(200).json({
-          isRegistered: true,
-          field: 'username',
-          value: req.body.username,
-        });
-        return;
+      if (isRegisteredUsernameDb.success) {
+        if (!isRegisteredUsernameDb.data) {
+          res.status(200).json({
+            isRegistered: false,
+          });
+          return;
+        } else {
+          res.status(200).json({
+            isRegistered: true,
+            field: 'username',
+            value: req.body.username,
+          });
+          return;
+        }
       }
       res.status(200).json({
-        isRegistered: false,
+        isRegistered: true,
       });
     } catch (error) {
       handleResponse({ res: res, serviceRes: serviceErrorHandler(error) });

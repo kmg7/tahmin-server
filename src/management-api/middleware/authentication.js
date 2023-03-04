@@ -1,11 +1,12 @@
 import { AuthManager } from '../../utils/authentication/auth_manager.js';
 import { managementAdmin } from '../../utils/authentication/firebase_utils.js';
 import { NODE_ENV, DEV_AUTH_ID, DEV_AUTH_NAME, DEV_AUTH_MAIL } from '../../config.js';
-import { getMessage, ErrorLayers } from '../../utils/errors/index.js';
+import { errorModel, errorCodes } from '../../utils/errors/index.js';
 import checkPermissions from '../../utils/authentication/check_permissions.js';
 import { Models, ORMManager } from '../../utils/database/sql/index.js';
 const authorityModel = new ORMManager({ model: Models.AUTHORITY });
 const auth_manager = new AuthManager({ firebaseAdmin: managementAdmin });
+
 export const authenticateUser = async (req, res, next) => {
   //FIXME no prod
   if (NODE_ENV == 'development-no-auth') {
@@ -18,23 +19,19 @@ export const authenticateUser = async (req, res, next) => {
   } else {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      res.status(401).json({
-        message: getMessage({ layer: ErrorLayers.server, code: 'unauthorized' }),
-      });
+      res.status(401).json(errorModel({ code: errorCodes.SERVER.unauthorized }));
     } else {
       const token = authHeader.split(' ')[1];
       try {
         const decToken = await auth_manager.validateToken(token);
         if (!decToken.valid) {
-          res.status(401).json({ message: getMessage({ layer: ErrorLayers.server, code: 'unauthorized' }) });
+          res.status(401).json(errorModel({ code: errorCodes.SERVER.unauthorized }));
         } else {
           req.user = decToken.user;
           next();
         }
       } catch (error) {
-        res.status(401).json({
-          message: getMessage({ layer: ErrorLayers.server, code: 'unauthorized' }),
-        });
+        res.status(401).json(errorModel({ code: errorCodes.SERVER.unauthorized }));
       }
     }
   }
@@ -53,9 +50,7 @@ export const authorizePermissions = (...feature) => {
           return;
         }
       }
-      res.status(401).json({
-        message: getMessage({ layer: ErrorLayers.server, code: 'unauthorized' }),
-      });
+      res.status(401).json(errorModel({ code: errorCodes.SERVER.unauthorized }));
     }
   };
 };
