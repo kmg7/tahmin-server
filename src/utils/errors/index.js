@@ -1,13 +1,18 @@
-import * as english from './locales/en.js';
+import * as codes from './error_codes.js';
 
-const locales = { en: english };
+export const errorCodes = codes;
 
-export const getMessage = ({ locale, layer, code }) => {
-  if (!locales.hasOwnProperty(locale)) locale = 'en';
-  if (!layer) layer = ErrorLayers.internal;
-  if (layer == ErrorLayers.internal) return locales[locale].INTERNAL;
+export const getCode = ({ layer, code }) => {
+  if (!layer || layer == ErrorLayers.internal) return codes.INTERNAL;
 
-  return locales[locale][layer][code];
+  return codes[layer][code];
+};
+
+export const errorModel = ({ code, meta }) => {
+  return {
+    code: code,
+    meta: meta,
+  };
 };
 
 export const ErrorLevels = {
